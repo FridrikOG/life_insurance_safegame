@@ -33,12 +33,7 @@ const Navbar = () => {
             </li>
             <li className="nav-item">
               <div className="nav-link">
-                <Link href="/annall">Annall</Link>
-              </div>
-            </li>
-            <li className="nav-item">
-              <div className="nav-link">
-                <Link href="/safegame">SafeGame</Link>
+                <Link href="/document">Document</Link>
               </div>
             </li>
           </ul>
@@ -51,7 +46,7 @@ const Navbar = () => {
               // className="rounded w-100 m-4"
             />
             <span className="navbar-text">
-              Property of University of Reykjavik
+              Document platform 
             </span>
           </div>
         </div>
