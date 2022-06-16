@@ -1,0 +1,25 @@
+.cardBg {
+  background-color: lightgray;
+  opacity: 0.9;
+  transition: 0.8s;
+}
+
+.cardBg:hover {
+  opacity: 0.9;
+  transition: 0.8s;
+
+  box-shadow: 8px 8px 8px black;
+  transform: scale(1.05);
+}
+
+.cardBg:hover > .top {
+  opacity: 0.9;
+  transition: 0.8s;
+  background-color: var(--ru-color);
+}
+
+.top {
+  opacity: 0.9;
+  transition: 0.8s;
+  background-color: lightgray;
+}

@@ -1,0 +1,65 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* img {
+  float: left;
+  width: auto;
+  max-height: 260px;
+  object-fit: cover;
+} */
+
+:root {
+  --ru-color: #e42c09;
+  --ru-dark-color: #c12404;
+}
+
+.ru-btn {
+  background-color: red;
+  color: white;
+  font-size: large;
+}
+
+.ru-btn:hover {
+  background-color: var(--ru-color);
+  color: white;
+}
+
+.ap-main {
+  background-image: url("../public/ru.png");
+  /* background-color: #cccccc; */
+
+  padding: 100px;
+  margin: 100px;
+}
+
+.caro-bg {
+  background-color: lightgray;
+}
+
+/* 
+
+Added this because all the cards were all good except when on mobile 590px
+Display one card at a time - colum-direction
+
+*/
+@media (max-width: 590px) {
+  .card-deck {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+}
