@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from logging import raiseExceptions
 from re import T
-from .models import User
+from .models import User, Insurance
 from django.http import HttpResponse, JsonResponse
-from rest_framework import status, generics
+from rest_framework import status, generics, serializers
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
 import pandas as pd
@@ -14,6 +14,16 @@ from user.views import *
 COVER_AMOUNT=2500000 
 BASE_RATE=0.01
 # Create your views here.
+class InsuranceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Insurance
+        optional_fields = ['dateCreated', 'approved', ]
+        fields = ('user','age', 'dateCreated', 'approved', 'active')
+    def validate(self,data):
+        if data['age'] < 1:
+            raise serializers.ValidationError("Age must be above 1")
+        return data
+
 
 def getTables():
     print("PWD ", os.getcwd())
@@ -74,9 +84,11 @@ class CreateAPIVIEW(generics.GenericAPIView):
     def get(self, request):
         ''' Get an insurance contract '''
         user = getUser(request)
+        data = request.data
+        print('data to addd ', data )
         print('your user ', user)
         mortalityTable, riskLoads  = getTables()
         rate =get_rate(24,'male',['Smoker','CarOwner'], mortalityTable, riskLoads)
         print("John bro ", rate)
-    
+
         return JsonResponse({"rate" : rate}, status=status.HTTP_200_OK)
