@@ -36,16 +36,19 @@ class CustomRedirect(HttpResponsePermanentRedirect):
 def getUserId(request):
     ''' Takes in the HTTP request and extracts the token out of it'''
     auth = get_authorization_header(request).split()
-    decoded = jwt.decode(auth[1].decode("utf-8"),
+    try:
+        decoded = jwt.decode(auth[1].decode("utf-8"),
                          settings.SECRET_KEY, algorithms=['HS256'])
+    except:
+        return False
     return decoded['user_id']
 
 def getUser(request):
     ''' Takes in the HTTP request and extracts the token out of it'''
     userId = getUserId(request)
-
+    if not userId:
+        return False
     user = User.objects.get(id=userId)
-    print('user ', user)
     return user
 
 

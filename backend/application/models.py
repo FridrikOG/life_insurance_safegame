@@ -15,4 +15,6 @@ def getCurrentDate():
 class Application(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     age = models.IntegerField(default=0)
+    approved = models.BooleanField(default=True)
+    active = models.BooleanField(default=True)
     dateCreated = models.CharField(max_length=255, default=getCurrentDate())

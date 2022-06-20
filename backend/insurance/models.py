@@ -15,3 +15,4 @@ class Insurance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     premium = models.IntegerField(default=0)
     dateCreated = models.CharField(max_length=255, default=getCurrentDate())
+    
