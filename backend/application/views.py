@@ -2,14 +2,19 @@ from django.shortcuts import render
 from django.shortcuts import render
 from logging import raiseExceptions
 from re import T
-from .models import User
+from .models import Application, User
 from django.http import HttpResponse, JsonResponse
-from rest_framework import status, generics
+from rest_framework import status, generics, serializers
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
 from user.views import *
-
 # Create your views here.
+
+
+class ItemApplication(serializers.ModelSerializer):
+    class Meta:
+        model = Application
+        fields = ('user','age', 'dateCreated')
 
 
 @permission_classes([AllowAny])
@@ -19,19 +24,28 @@ class CreateApplicationAPIVIEW(generics.GenericAPIView):
 
     def post(self, request):
         ''' Get an insurance contract '''
-        user = getUser(request)
-        print('your user ', user)
-        mortalityTable, riskLoads  = getTables()
-        john=get_rate(age=24,gender='male', factors=['Smoker','CarOwner'], mortalityTable= mortalityTable, riskLoads=riskLoads)
-        print("John bro ", john)
-        return JsonResponse({}, status=status.HTTP_200_OK)
+        user = getUserId(request)
+        data = request.data
+        data['user'] = user
+        data['dateCreated'] = 0
+        item = ItemApplication(data=request.data)
+        print("The item ", item.is_valid() )
+        item.is_valid(raise_exception=True)
+        # validating for already existing data
+        if Application.objects.filter(**request.data).exists():
+            raise serializers.ValidationError('This data already exists')
+
+        if item.is_valid():
+            item.save()
+            return JsonResponse(item.data)
+        else:
+            return JsonResponse(status=status.HTTP_404_NOT_FOUND)
+        
 
     def get(self, request):
-        ''' Get an insurance contract '''
+        ''' Get application contract '''
         user = getUser(request)
-        print('your user ', user)
-        mortalityTable, riskLoads  = getTables()
-        rate =get_rate(24,'male',['Smoker','CarOwner'], mortalityTable, riskLoads)
-        print("John bro ", rate)
-    
-        return JsonResponse({"rate" : rate}, status=status.HTTP_200_OK)
+
+
+
+        return JsonResponse({"rate" : 0}, status=status.HTTP_200_OK)
