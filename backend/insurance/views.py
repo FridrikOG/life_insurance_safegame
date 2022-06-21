@@ -92,3 +92,7 @@ class CreateAPIVIEW(generics.GenericAPIView):
         print("John bro ", rate)
 
         return JsonResponse({"rate" : rate}, status=status.HTTP_200_OK)
+    def withdrawApplicatioN(self, request):
+        
+        return JsonResponse({"rate" : "Here"}, status=status.HTTP_200_OK)
+    

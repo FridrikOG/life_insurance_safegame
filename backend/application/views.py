@@ -2,13 +2,17 @@ from django.shortcuts import render
 from django.shortcuts import render
 from logging import raiseExceptions
 from re import T
-from .models import Application, User
+
+from insurance.models import Insurance
+from .models import *
+
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status, generics, serializers
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
 from user.views import *
 from .serializers import ApplicationSerializer
+
 
 
 @permission_classes([AllowAny])
@@ -30,7 +34,7 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
         # Check if user has an active application
         # Can only have one active application at a time
         if Application.objects.filter(user=userId, active=True).exists():
-            return JsonResponse({"message" : "User has an active application"} ,status=status.HTTP_400)
+            return JsonResponse({"message" : "User has an active application"} ,status=status.HTTP_401_UNAUTHORIZED)
         
         if item.is_valid():
             item.save()
@@ -50,9 +54,46 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
         if applications:
             application = applications.first()
             data = ApplicationSerializer(application)
-            return Response(data.data)
+            return JsonResponse(data.data)
         else: 
-            return Response({"message":"User has no active application"}, status=status.HTTP_200_OK)
+            return JsonResponse({"message":"User has no active application"}, status=status.HTTP_200_OK)
+        
+        
+        
+def extractApplicationId(request):
+    try:
+        return request.data['applicationId']
+    except:
+        return False
+
+class WithdrawApplicationAPIVIEW(generics.GenericAPIView):
+    def __init__(self):
+        self.serializer = None
+    def post(self, request):
+        applicationId = extractApplicationId(request)
+        if not applicationId:
+            return JsonResponse({"message" : "Application Id not found"},status=status.HTTP_401_UNAUTHORIZED)
+        userId = getUserId(request)
+        if not userId:
+            return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
+        applications = Application.objects.filter(user_id=userId, id=applicationId)
+        if not applications:
+            return JsonResponse({"message":"Application not found"}, status=status.HTTP_200_OK)
+        application = applications.first()
+        if application.active == False:
+            return JsonResponse({"message":"Application is not active"}, status=status.HTTP_200_OK)
+        
+      
+        ins = Insurance.objects.filter(application=application.id)
+        if ins:
+            return JsonResponse({"message":"Already belongs to an Insurance"}, status=status.HTTP_200_OK) 
+        
+        application.active = False
+        application.save()
+        
+        app = ApplicationSerializer(application)
+        return JsonResponse(app.data)
+        
     
 class AllApplicationAPIVIEW(generics.GenericAPIView):
     def __init__(self):
