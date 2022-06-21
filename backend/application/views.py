@@ -27,11 +27,11 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
         item = ApplicationSerializer(data=request.data)
         item.is_valid(raise_exception=True)
         
-        if Application.objects.filter(user=userId, active=True ).exists():
-            return JsonResponse({"message" : "User has an active application"} ,status=status.HTTP_200_OK)
+        # Check if user has an active application
+        # Can only have one active application at a time
+        if Application.objects.filter(user=userId, active=True).exists():
+            return JsonResponse({"message" : "User has an active application"} ,status=status.HTTP_400)
         
-        if Application.objects.filter(**request.data).exists():
-            raise serializers.ValidationError('This data already exists')
         if item.is_valid():
             item.save()
             return JsonResponse(item.data)

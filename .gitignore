@@ -1,0 +1,10 @@
+
+*.pyc
+*.pyc
+backend/insurance/__pycache__/models.cpython-310.pyc
+backend/insurance/__pycache__/views.cpython-310.pyc
+backend/insurance/migrations/0014_alter_insurance_datecreated_alter_insurance_id.py
+backend/insurance/migrations/0015_alter_insurance_datecreated.py
+backend/insurance/migrations/0016_alter_insurance_datecreated.py
+backend/insurance/migrations/0017_alter_insurance_datecreated.py
+backend/squid/__pycache__/settings.cpython-310.pyc
