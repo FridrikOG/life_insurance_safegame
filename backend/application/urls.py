@@ -5,7 +5,8 @@ from .views import ApplicationAPIVIEW,AllApplicationAPIVIEW, WithdrawApplication
 # Pattern matching
 urlpatterns = [
     path('', ApplicationAPIVIEW.as_view(), name='createinsurance'),
-    path('withdraw/', WithdrawApplicationAPIVIEW.as_view(), name='createinsurance'),
+    path('<int:id>/', ApplicationAPIVIEW.as_view(), name='createinsurance'),
+    path('withdraw/<int:id>/', WithdrawApplicationAPIVIEW.as_view(), name='createinsurance'),
     path('all/', AllApplicationAPIVIEW.as_view(), name='ins'),
 
     # path('<int:id>/', CreateAPIVIEW.as_view(), name='createinsurance'),

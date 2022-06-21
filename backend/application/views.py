@@ -58,6 +58,27 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
         else: 
             return JsonResponse({"message":"User has no active application"}, status=status.HTTP_200_OK)
         
+    def patch(self, request,id):
+
+        if not id:
+            return JsonResponse({"message" : "Application Id not found"},status=status.HTTP_401_UNAUTHORIZED)
+        userId = getUserId(request)
+        if not userId:
+            return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
+        applications = Application.objects.filter(user_id=userId, id=id)
+        if not applications:
+            return JsonResponse({"message":"Application not found"}, status=status.HTTP_200_OK)
+        application = applications.first()
+        if application.active == False:
+            return JsonResponse({"message":"Application is not active"}, status=status.HTTP_200_OK)
+        ins = Insurance.objects.filter(application=application.id)
+        if ins:
+            return JsonResponse({"message":"Already belongs to an Insurance"}, status=status.HTTP_200_OK) 
+        serializer = ApplicationSerializer(application, data=request.data, partial=True) # set partial=True to update a data partially
+        if not serializer.is_valid():
+            return JsonResponse({"message":"Invalid JSON serializer"}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return JsonResponse({"message": serializer.data}, status=status.HTTP_200_OK) 
         
         
 def extractApplicationId(request):
@@ -69,21 +90,19 @@ def extractApplicationId(request):
 class WithdrawApplicationAPIVIEW(generics.GenericAPIView):
     def __init__(self):
         self.serializer = None
-    def post(self, request):
-        applicationId = extractApplicationId(request)
-        if not applicationId:
+    def post(self, request,id):
+
+        if not id:
             return JsonResponse({"message" : "Application Id not found"},status=status.HTTP_401_UNAUTHORIZED)
         userId = getUserId(request)
         if not userId:
             return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
-        applications = Application.objects.filter(user_id=userId, id=applicationId)
+        applications = Application.objects.filter(user_id=userId, id=id)
         if not applications:
             return JsonResponse({"message":"Application not found"}, status=status.HTTP_200_OK)
         application = applications.first()
         if application.active == False:
             return JsonResponse({"message":"Application is not active"}, status=status.HTTP_200_OK)
-        
-      
         ins = Insurance.objects.filter(application=application.id)
         if ins:
             return JsonResponse({"message":"Already belongs to an Insurance"}, status=status.HTTP_200_OK) 
