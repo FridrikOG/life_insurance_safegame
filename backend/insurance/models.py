@@ -12,9 +12,9 @@ def getCurrentDate():
 
 # Create your models here.
 class Insurance(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
-    premium = models.IntegerField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    premium = models.FloatField(default=0)
     dateCreated = models.DateField(max_length=255, auto_now_add=True)
-    dateApproved = models.DateField(max_length=255, default = None)
+    dateApproved = models.DateField(max_length=255, auto_now_add=True)
     

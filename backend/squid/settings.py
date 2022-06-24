@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'user.apps.UserConfig',
     'application.apps.ApplicationConfig',
     'insurance.apps.InsuranceConfig',
+    'payment.apps.PaymentConfig',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
 
