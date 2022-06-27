@@ -107,7 +107,7 @@ class CreateAPIVIEW(generics.GenericAPIView):
             return JsonResponse({"data" : insJson.data}, status=status.HTTP_200_OK)
         insurance = insurance.first()
         insurance = InsuranceSerializer(insurance)
-        return JsonResponse({"data" : insurance.data}, status=status.HTTP_200_OK)
+        return JsonResponse({}, status=status.HTTP_400_BAD_REQUEST)
     
 
     def get(self, request):
