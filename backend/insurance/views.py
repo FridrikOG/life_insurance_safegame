@@ -16,7 +16,7 @@ from user.views import *
 from application.views import *
 import datetime
 from .serializers import InsuranceSerializer
-from payment.views import *
+
 
 COVER_AMOUNT=2500000 
 BASE_RATE=0.01
