@@ -122,15 +122,6 @@ def checkPassword(password, password2):
             {'password': 'passwords not the same'})
 
 
-def checkUsernameExists(username, userId):
-    try:
-        user = User.objects.get(username=username)
-        if user.id != userId:
-            return False
-        else:
-            return True
-    except:
-        return True
 
 
 class UpdateProfile(generics.GenericAPIView):
