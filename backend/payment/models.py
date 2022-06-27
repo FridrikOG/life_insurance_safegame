@@ -5,5 +5,6 @@ from insurance.models import Insurance
 
 class Payment(models.Model):
     insurance = models.ForeignKey(Insurance, on_delete=models.CASCADE)
+    
     payment = models.IntegerField(max_length=100, default=0)
     datePaid = models.DateTimeField(auto_now_add=True)

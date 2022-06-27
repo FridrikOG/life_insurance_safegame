@@ -13,24 +13,13 @@ import pandas as pd
 import numpy as np
 import sys, os
 from user.views import *
+from application.views import *
 import datetime
-
+from .serializers import InsuranceSerializer
 
 COVER_AMOUNT=2500000 
 BASE_RATE=0.01
 # Create your views here.
-class InsuranceSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    application = ApplicationSerializer()
-    class Meta:
-        model = Insurance
-        optional_fields = ['dateCreated', 'dateApproved']
-        fields = ('user','application', 'premium', 'application', 'dateCreated','dateApproved')
-        
-    def validate(self,data):
-        if data['premium'] < 0:
-            raise serializers.ValidationError("Premium must be 0 or greater")
-        return data
 
 def getTables():
     print("PWD ", os.getcwd())
@@ -47,8 +36,8 @@ def getTables():
     print("The files ", mortalityTable)
     return mortalityTable, riskLoads
 
-def get_rate(age,gender,factors, mortalityTable, riskLoads):
-    print("The age ", age )
+def getRate(age,gender = 'male',factors = []):
+    mortalityTable, riskLoads = getTables()
     if gender=='male':
         #hazardRate=mortalityTable.loc[mortalityTable.Age == age,'Male_Hazard_Rate'].values[0]
         expectedLoss=mortalityTable.loc[mortalityTable.Age == age,'ExpectedLossMale'].values[0]
@@ -74,17 +63,14 @@ def get_rate(age,gender,factors, mortalityTable, riskLoads):
 
     print('Your Annual Premium is:')
 
-    return Annual_Premium
+    return int(Annual_Premium)
 
 
 
-def checkHasPaid(insurance):
-    print("Inside checkHasPaid ", insurance)
+def getInsurance(application):
+    return Insurance.objects.filter(application=application).first()
 
-    ins = InsuranceSerializer(insurance)
- 
-    
-    #print("seria ", ins.data)
+
     
 @permission_classes([AllowAny])
 class CreateAPIVIEW(generics.GenericAPIView):
@@ -96,12 +82,12 @@ class CreateAPIVIEW(generics.GenericAPIView):
         user = getUser(request)
         data = request.data
         mortalityTable, riskLoads  = getTables()
-        application = Application.objects.filter(user=user.id, active=True).first()
+        application = getApplication(user.id)
         if not application:
             return JsonResponse({"message" : "No application found"}, status=status.HTTP_200_OK)
-        insurance = Insurance.objects.filter(application=application)
+        insurance = getInsurance(application)
         if not insurance:
-            premium =get_rate(application.age,'male',['cancer'], mortalityTable, riskLoads)
+            premium =getRate(application.age,'male',['cancer'], mortalityTable, riskLoads)
             data = {'rate':premium}
             # User accepts the insurance contract
             print("Insurance baby ")
@@ -127,17 +113,19 @@ class CreateAPIVIEW(generics.GenericAPIView):
         user = getUser(request)
         data = request.data
         mortalityTable, riskLoads  = getTables()
-        application = Application.objects.filter(user=user.id, active=True).first()
+        
+        application = getApplication(user.id)
         if not application:
             return JsonResponse({"message" : "No application found"}, status=status.HTTP_200_OK)
-        insurance = Insurance.objects.filter(application=application)
+        # Get the insurance attached to the application if it exists
+        insurance = getInsurance(application)
         if not insurance:
             return JsonResponse({"data" : {}}, status=status.HTTP_200_OK)
-        insurance = insurance.first()
-        insurance = InsuranceSerializer(insurance)
-        hasPaid = checkHasPaid(insurance)
         
-        return JsonResponse({"data" : insurance.data}, status=status.HTTP_200_OK)
+        ins = InsuranceSerializer(insurance)
+        # hasPaid = checkHasPaid(insurance)
+        
+        return JsonResponse({"data" : ins.data}, status=status.HTTP_200_OK)
         
         
     def withdrawApplicatioN(self, request):

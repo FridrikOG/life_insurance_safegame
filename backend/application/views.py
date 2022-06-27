@@ -14,6 +14,9 @@ from user.views import *
 from .serializers import ApplicationSerializer
 
 
+def getApplication(userId):
+    return Application.objects.filter(user=userId, active=True).first()
+
 
 @permission_classes([AllowAny])
 class ApplicationAPIVIEW(generics.GenericAPIView):
