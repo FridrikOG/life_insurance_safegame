@@ -2,44 +2,25 @@
 
 Lightweight blockchain project
 
-### Running
 
 
 ### Installing
 
-Start by creating a virtual environment in the root directory of the project
+pip install virtualenv
 
-```bash
-python -m venv .venv
-```
+virtualenv env
 
-Activate the virtual environment
+Mac:
+source mypython/bin/activate
+Windows:
+mypthon\Scripts\activate
 
-windows
+### Running
 
-```bash
-. .venv/Scripts/activate
-```
+python backend/manage.py
 
-linux
+OR
+./dev.sh
 
-```bash
-. .venv/bin/activate
-```
-
-Install the project itself (optional)
-
-Installed the required packages
-
-```bash
-pip install -r requirements.txt
-```
-```
-/src/<script>
-```
-
-Now you should be able to run any script in the project from the root directory
-
-```
-python <PATH_TO_SCRIPT>
-```
+### Leave virtual environment
+deactivate
