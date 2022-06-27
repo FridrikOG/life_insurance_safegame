@@ -16,6 +16,7 @@ from user.views import *
 from application.views import *
 import datetime
 from .serializers import InsuranceSerializer
+from payment.views import *
 
 COVER_AMOUNT=2500000 
 BASE_RATE=0.01
@@ -70,7 +71,15 @@ def getRate(age,gender = 'male',factors = []):
 def getInsurance(application):
     return Insurance.objects.filter(application=application).first()
 
-
+def acceptedInsurance(insurance):
+    hasBeenPaid = checkHasPaid(insurance)
+    insurance = InsuranceSerializer(insurance)
+    insData = insurance.data
+    if hasBeenPaid:
+        insData['hasPaid'] = True
+    else:
+        insData['hasPaid'] = True
+    return insData
     
 @permission_classes([AllowAny])
 class CreateAPIVIEW(generics.GenericAPIView):
@@ -103,17 +112,11 @@ class CreateAPIVIEW(generics.GenericAPIView):
             ins.save()
             insJson = InsuranceSerializer(ins)
             return JsonResponse({"data" : insJson.data}, status=status.HTTP_200_OK)
-        insurance = insurance.first()
-        insurance = InsuranceSerializer(insurance)
-        return JsonResponse({"data" : insurance.data}, status=status.HTTP_400_BAD_REQUEST)
-    
-    
+        insData = acceptedInsurance(insurance)
+        return JsonResponse({"data" : insData}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         user = getUser(request)
-        data = request.data
-        mortalityTable, riskLoads  = getTables()
-        
         application = getApplication(user.id)
         if not application:
             return JsonResponse({"message" : "No application found"}, status=status.HTTP_200_OK)
@@ -121,12 +124,8 @@ class CreateAPIVIEW(generics.GenericAPIView):
         insurance = getInsurance(application)
         if not insurance:
             return JsonResponse({"data" : {}}, status=status.HTTP_200_OK)
-        
-        ins = InsuranceSerializer(insurance)
-        # hasPaid = checkHasPaid(insurance)
-        
-        return JsonResponse({"data" : ins.data}, status=status.HTTP_200_OK)
-        
+        insData = acceptedInsurance(insurance)
+        return JsonResponse({"data" : insData}, status=status.HTTP_200_OK)
         
     def withdrawApplicatioN(self, request):
         
