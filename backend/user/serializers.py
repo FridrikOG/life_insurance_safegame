@@ -39,7 +39,7 @@ class LoginSerializer(serializers.Serializer):
             'email': user.email,
             'password': password,
             'password2': password,
-            'username': user.username,
+    
             'firstname': user.firstname,
             'lastname': user.lastname,
             'imgURL': user.imgURL,
@@ -58,7 +58,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'password', 'password2', 'firstname', 'lastname',
-                  'username', 'imgURL', 'tokens']  # Fields that are returned from validate e.g
+                   'imgURL', 'tokens']  # Fields that are returned from validate e.g
         extra_kwargs = {
             'password': {'error_messages': {'miss-match': "Passwords do not match"}},
         }
@@ -74,7 +74,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         password2 = attrs.get('password2', '')
         firstname = attrs.get('firstname', '')
         lastname = attrs.get('lastname', '')
-        username = attrs.get('username', '')
         imgURL = attrs.get('imgURL', '')
 
         # Custom ValidationError exception for the password field
@@ -83,7 +82,7 @@ class RegisterSerializer(serializers.ModelSerializer):
                 {'password': 'Passwords do not match'})
 
         data = self.create_user({"email": email, "password": password, "password2": password2,
-                                 "firstname": firstname, "lastname": lastname, "username": username, "imgURL": imgURL})
+                                 "firstname": firstname, "lastname": lastname, "imgURL": imgURL})
 
         return {
             'id': data['user'].id,
@@ -92,7 +91,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             'password2': data['user'].password2,
             'firstname': data['user'].firstname,
             'lastname': data['user'].lastname,
-            'username': data['user'].username,
             'imgURL': data['user'].imgURL,
             "tokens": data['tokens'],
         }
@@ -103,7 +101,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'password', 'password2', 'firstname', 'lastname',
-                  'username', 'imgURL']  # Fields that are returned from validate e.g
+                   'imgURL']  # Fields that are returned from validate e.g
 
     def update_user(self):
         User.objects.update(self.validated_data)
@@ -112,14 +110,12 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         email = attrs.get('email', '')
         firstname = attrs.get('firstname', '')
         lastname = attrs.get('lastname', '')
-        username = attrs.get('username', '')
         imgURL = attrs.get('imgURL', '')
 
         return {
             'email': email,
             'firstname': firstname,
             'lastname': lastname,
-            'username': username,
             'imgURL': imgURL,
         }
 
@@ -142,7 +138,7 @@ class ResetPasswordEmailRequestSerializer(serializers.Serializer):
             relativeLink = reverse(
                 'password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
             absurl = 'http://'+current_site + relativeLink
-            email_body = 'Hi ' + user.username + 'use link below to reset your password'
+            email_body = 'Hi use link below to reset your password'
             data = {
                 'email_body': email_body, 'to_meial': user.email, 'email_subject': 'Reset password'}
 

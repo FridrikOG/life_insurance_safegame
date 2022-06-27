@@ -16,7 +16,6 @@ class UserManager(BaseUserManager):
             user = self.model(
                 email=self.normalize_email(data['email']),
                 password=data['password'],
-                username=data['username'],
                 firstname=data['firstname'],
                 lastname=data['lastname'],
                 imgURL=data['imgURL'],
@@ -29,7 +28,6 @@ class UserManager(BaseUserManager):
             user = self.model(
                 email=self.normalize_email(data['email']),
                 password=data['password'],
-                username=data['username'],
                 firstname=data['firstname'],
                 lastname=data['lastname'],
                 imgURL=data['imgURL'],
@@ -64,7 +62,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     password2 = models.CharField(max_length=255)
-    username = models.CharField(max_length=255, unique=True)
     firstname = models.CharField(max_length=255)
     lastname = models.CharField(max_length=255)
     imgURL = models.CharField(max_length=999, blank=True)
@@ -89,7 +86,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __setUserAttributes__(self, data):
         self.email = data['email']
         self.set_password(data['password'])
-        self.username = data['username']
+
         self.firstname = data['firstname']
         self.lastname = data['lastname']
         self.imgURL = data['imgURL']
@@ -102,7 +99,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def getJson(self):
         json = {
             "id": self.id,
-            "username": self.username,
+
             "email": self.email,
             "imgURL": self.imgURL,
             "firstname": self.firstname,
@@ -118,7 +115,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return 'User Instance: {' + f'{self.id}, ' \
                f'{self.email}, ' \
                f'{self.password}, '\
-               f'{self.username}, ' \
                f'{self.firstname}, ' \
                f'{self.lastname}, ' \
                f'{self.imgURL}, ' + '}' \

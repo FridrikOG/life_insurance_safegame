@@ -147,15 +147,6 @@ class UpdateProfile(generics.GenericAPIView):
         if data['password'] != '':
             checkPassword(data['password'], data['password2'])
             user.set_password(data['password'])
-        if data['username'] != '':
-            if checkUsernameExists(data['username'], userId):
-                if len(data['username']) > 30:
-                    return Response({"username": "Username cannot exceed 30 characters"},
-                                    status=status.HTTP_400_BAD_REQUEST, content_type='application/json')
-                user.username = data['username']
-            else:
-
-                return Response({"username": "A User with that username already exists"}, status=status.HTTP_400_BAD_REQUEST, content_type='application/json')
         if data['firstname'] != '':
             if len(data['firstname']) > 30:
                 return Response({"firstname": "firstname cannot exceed 30 characters"},
