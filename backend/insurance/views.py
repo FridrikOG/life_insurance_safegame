@@ -135,7 +135,6 @@ class CreateAPIVIEW(generics.GenericAPIView):
             return JsonResponse({"data" : {}}, status=status.HTTP_200_OK)
         insurance = insurance.first()
         insurance = InsuranceSerializer(insurance)
-        
         hasPaid = checkHasPaid(insurance)
         
         return JsonResponse({"data" : insurance.data}, status=status.HTTP_200_OK)
