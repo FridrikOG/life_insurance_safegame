@@ -7,7 +7,4 @@ from . import views
 # Pattern matching
 urlpatterns = [
     path('', PaymentAPIVIEW.as_view(), name='createinsurance'),
-
-    # path('update/', LogOutAPIVIEW.as_view(), name='logout'),
-    # path('delete/', UpdateProfile.as_view(), name='update'),
 ]

@@ -5,11 +5,11 @@ from user.serializers import UserSerializer
 
 class InsuranceSerializer(serializers.ModelSerializer):
     # user = UserSerializer()
-    application = ApplicationSerializer()
+    # application = ApplicationSerializer()
     class Meta:
         model = Insurance
-        optional_fields = ['dateCreated', 'dateApproved']
-        fields = ('user','application', 'premium', 'application', 'dateCreated','dateApproved')
+        optional_fields = ['dateCreated', 'dateApproved', 'dateExpires']
+        fields = ('user','application', 'premium', 'application', 'dateCreated','dateApproved', 'dateExpires')
         
     def validate(self,data):
         
