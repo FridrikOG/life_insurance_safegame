@@ -80,7 +80,7 @@ class CreateAPIVIEW(generics.GenericAPIView):
         data = request.data
         application = getApplication(user.id)
         if not application:
-            return JsonResponse({"message" : "No application found", "state":{"hasApplication":False}}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({"message" : "Has insurance", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_400_BADHTTP_200_OK)
         insurance = getInsurance(application)
         if not insurance:
             premium =getRate(application.age,'male',['cancer'])
@@ -100,16 +100,18 @@ class CreateAPIVIEW(generics.GenericAPIView):
             ins.is_valid(raise_exception=True)
             
             ins.save()
-            insJson = InsuranceSerializer(ins)
-            return JsonResponse({"data" : insJson.data, "state":{"hasApplication":False}}, status=status.HTTP_200_OK)
-        insData = acceptedInsurance(insurance)
-        return JsonResponse({"data" : insData, "state":{"hasApplication":False}}, status=status.HTTP_400_BAD_REQUEST)
+            data = InsuranceSerializer(ins)
+            data['state'] = {'hasInsurance' : True, 'hasApplication' : True}
+            return JsonResponse(data, status=status.HTTP_200_OK)
+        data = acceptedInsurance(insurance)
+        data['state'] = {"hasApplication":False}
+        return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         user = getUser(request)
         application = getApplication(user.id)
         if not application:
-            return JsonResponse({"message" : "No application found"}, status=status.HTTP_200_OK)
+            return JsonResponse({"message" : "Has insurance", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_400_BADHTTP_200_OK)
         # Get the insurance attached to the application if it exists
         insurance = getInsurance(application)
         if not insurance:
@@ -118,10 +120,14 @@ class CreateAPIVIEW(generics.GenericAPIView):
                 'premium' : premium,
                 'hasInsurance' : False
             }
+
+            dict['state'] = {'hasInsurance' : True, 'hasApplication' : True}
             return JsonResponse({"data" : dict}, status=status.HTTP_200_OK)
         insData = acceptedInsurance(insurance)
-        return JsonResponse({"message" : "No application found", "state":{"hasApplication":False}}, status=status.HTTP_200_OK)
-        
+        insData['hasApplication'] = True
+        insData['hasInsurance'] = True
+        return JsonResponse(insData, status=status.HTTP_200_OK)
+    
     def withdrawApplicatioN(self, request):
         
         return JsonResponse({"rate" : "Here"}, status=status.HTTP_200_OK)
