@@ -80,7 +80,7 @@ class CreateAPIVIEW(generics.GenericAPIView):
         data = request.data
         application = getApplication(user.id)
         if not application:
-            return JsonResponse({"message" : "No application found"}, status=status.HTTP_200_OK)
+            return JsonResponse({"message" : "No application found", "state":{"hasApplication":False}}, status=status.HTTP_400_BAD_REQUEST)
         insurance = getInsurance(application)
         if not insurance:
             premium =getRate(application.age,'male',['cancer'])
@@ -101,9 +101,9 @@ class CreateAPIVIEW(generics.GenericAPIView):
             
             ins.save()
             insJson = InsuranceSerializer(ins)
-            return JsonResponse({"data" : insJson.data}, status=status.HTTP_200_OK)
+            return JsonResponse({"data" : insJson.data, "state":{"hasApplication":False}}, status=status.HTTP_200_OK)
         insData = acceptedInsurance(insurance)
-        return JsonResponse({"data" : insData}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({"data" : insData, "state":{"hasApplication":False}}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         user = getUser(request)
@@ -120,7 +120,7 @@ class CreateAPIVIEW(generics.GenericAPIView):
             }
             return JsonResponse({"data" : dict}, status=status.HTTP_200_OK)
         insData = acceptedInsurance(insurance)
-        return JsonResponse({"data" : insData}, status=status.HTTP_200_OK)
+        return JsonResponse({"message" : "No application found", "state":{"hasApplication":False}}, status=status.HTTP_200_OK)
         
     def withdrawApplicatioN(self, request):
         

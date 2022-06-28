@@ -64,7 +64,7 @@ class PaymentAPIVIEW(generics.GenericAPIView):
 
         print(insurance.dateCreated, type(insurance.dateCreated))
         expiryOfInsurance = dt.now() + relativedelta(years=1)
-        insData['dateExpires']
+        insData['dateExpires'] = expiryOfInsurance
     
         
         

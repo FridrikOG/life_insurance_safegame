@@ -2,10 +2,8 @@ from django.shortcuts import render
 from django.shortcuts import render
 from logging import raiseExceptions
 from re import T
-
 from insurance.models import Insurance
 from .models import *
-
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status, generics, serializers
 from rest_framework.decorators import permission_classes
@@ -16,7 +14,6 @@ from .serializers import ApplicationSerializer
 
 def getApplication(userId):
     return Application.objects.filter(user=userId, active=True).first()
-
 
 @permission_classes([AllowAny])
 class ApplicationAPIVIEW(generics.GenericAPIView):
@@ -38,8 +35,11 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
             return JsonResponse({"message" : "User has an active application"} ,status=status.HTTP_401_UNAUTHORIZED)
         if item.is_valid():
             item.save()
-            return JsonResponse(item.data)
+            data = item.data
+            data['state'] = {'hasApplication': True}
+            return JsonResponse(data)
         else:
+            data['state'] = {'hasApplication': False}
             return JsonResponse(status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request):
@@ -53,32 +53,36 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
         # if there is something in items else raise error
         if applications:
             application = applications.first()
-            data = ApplicationSerializer(application)
-            return JsonResponse(data.data)
+            data = ApplicationSerializer(application).data
+            data['state'] = {'hasApplication': True}
+            return JsonResponse(data, status=status.HTTP_200_OK)
         else:
-            return JsonResponse({"message":"User has no active application"}, status=status.HTTP_200_OK)
+            data = {}
+            data['state'] = {'hasApplication': False}
+            return JsonResponse(data, status=status.HTTP_200_OK)
         
     def patch(self, request, id):
         # If not id
         if not id:
-            return JsonResponse({"message" : "Application Id not found"},status=status.HTTP_401_UNAUTHORIZED)
+            return JsonResponse({"message" : "Application Id not found"},status=status.HTTP_404_NOT_FOUND)
         userId = getUserId(request)
         if not userId:
             return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
         applications = Application.objects.filter(user_id=userId, id=id)
         if not applications:
-            return JsonResponse({"message":"Application not found"}, status=status.HTTP_200_OK)
+            return JsonResponse({"message":"Application not found", "state": {"hasApplication" : False}}, status=status.HTTP_200_OK)
         application = applications.first()
         if application.active == False:
-            return JsonResponse({"message":"Application is not active"}, status=status.HTTP_200_OK)
+            return JsonResponse({"message":"Application not found", "state": {"hasApplication" : False}}, status=status.HTTP_200_OK)
         ins = Insurance.objects.filter(application=application.id)
         if ins:
-            return JsonResponse({"message":"Already belongs to an Insurance"}, status=status.HTTP_200_OK) 
+            return JsonResponse({"message":"Already belongs to an Insurance", "state": {"hasApplication" : True, "hasInsurance":True}}, status=status.HTTP_200_OK) 
         serializer = ApplicationSerializer(application, data=request.data, partial=True) # set partial=True to update a data partially
-        if not serializer.is_valid():
-            return JsonResponse({"message":"Invalid JSON serializer"}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raiseExceptions=True)
         serializer.save()
-        return JsonResponse({"message": serializer.data}, status=status.HTTP_200_OK) 
+        data = serializer.data
+        data['state'] = {'hasApplication': True}
+        return JsonResponse({data}, status=status.HTTP_200_OK) 
         
         
 def extractApplicationId(request):
@@ -90,27 +94,30 @@ def extractApplicationId(request):
 class WithdrawApplicationAPIVIEW(generics.GenericAPIView):
     def __init__(self):
         self.serializer = None
-    def post(self, request,id):
-        if not id:
-            return JsonResponse({"message" : "Application Id not found"},status=status.HTTP_401_UNAUTHORIZED)
+    def post(self, request):
+        ''' Withdraws the current active application if possible'''
+        # if not id:
+        #     return JsonResponse({"message" : "Application Id not found"},status=status.HTTP_404_NOT_FOUND)
         userId = getUserId(request)
         if not userId:
             return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
-        applications = Application.objects.filter(user_id=userId, id=id)
+        applications = Application.objects.filter(user_id=userId, active=True)
         if not applications:
-            return JsonResponse({"message":"Application not found"}, status=status.HTTP_200_OK)
+            return JsonResponse({"message":"Application not found", "state": {"hasApplication" : False}}, status=status.HTTP_404_NOT_FOUND)
         application = applications.first()
         if application.active == False:
-            return JsonResponse({"message":"Application is not active"}, status=status.HTTP_200_OK)
+            return JsonResponse({"message":"Application is not active"}, status=status.HTTP_400_BAD_REQUEST)
         ins = Insurance.objects.filter(application=application.id)
         if ins:
-            return JsonResponse({"message":"Already belongs to an Insurance"}, status=status.HTTP_200_OK) 
+            return JsonResponse({"message":"Already belongs to an Insurance"}, status=status.HTTP_400_BAD_REQUEST) 
         application.active = False
         application.save()
         app = ApplicationSerializer(application)
-        return JsonResponse(app.data)
+        data = app.data
+        data['state'] = {'hasApplication': True}
+        return JsonResponse(data, status=status.HTTP_200_OK)
         
-    
+
 class AllApplicationAPIVIEW(generics.GenericAPIView):
     def __init__(self):
         self.serializer = None
