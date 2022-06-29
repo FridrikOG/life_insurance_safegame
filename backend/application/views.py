@@ -13,7 +13,8 @@ from .serializers import ApplicationSerializer
 from payment.function import checkHasPaid
 
 def getApplication(userId):
-    return Application.objects.filter(user=userId, active=True).first()
+    app = Application.objects.filter(user=userId, active=True).first()
+    return app
 
 @permission_classes([AllowAny])
 class ApplicationAPIVIEW(generics.GenericAPIView):
@@ -56,7 +57,6 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
         retData = {}
         if applications:
             application = applications.first()
-            
             retData['application'] = ApplicationSerializer(application).data
             retData['state'] = {'hasApplication': True}
             return JsonResponse(retData, status=status.HTTP_200_OK)
@@ -66,9 +66,6 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
             return JsonResponse(retData, status=status.HTTP_200_OK)
         
     def patch(self, request):
-        # If not id
-        # if not id:
-        #     return JsonResponse({"message" : "Application Id not found"},status=status.HTTP_404_NOT_FOUND)
         userId = getUserId(request)
         if not userId:
             return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
@@ -133,7 +130,7 @@ class AllApplicationAPIVIEW(generics.GenericAPIView):
         if not user:
             return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
         allApp = Application.objects.filter(user_id=user)
-        if not allApp:        
+        if not allApp:
             return Response({'applications':[]},status=status.HTTP_200)
         allApp = ApplicationSerializer(allApp, many=True)
         return JsonResponse({'applications':allApp.data})

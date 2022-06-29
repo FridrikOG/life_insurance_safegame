@@ -18,11 +18,9 @@ import datetime
 from .serializers import InsuranceSerializer
 from django.utils.timezone import make_aware
 
-
 COVER_AMOUNT=2500000 
 BASE_RATE=0.01
 # Create your views here.
-
 def getTables():
     print("PWD ", os.getcwd())
     mortalityTable=pd.read_csv('backend/insurance/MortalityTable.csv',sep=';')
@@ -80,7 +78,7 @@ class CreateAPIVIEW(generics.GenericAPIView):
         data = request.data
         application = getApplication(user.id)
         if not application:
-            return JsonResponse({"message" : "Has insurance", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_400_BADHTTP_200_OK)
+            return JsonResponse({"message" : "Has insurance", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_400_BAD_REQUEST)
         insurance = getInsurance(application)
         if not insurance:
             premium =getRate(application.age,'male',['cancer'])
@@ -91,18 +89,18 @@ class CreateAPIVIEW(generics.GenericAPIView):
             print("The user ", user.id)
             print("Application  ", application.id)
             appJson = {
-                "application" : application.id,
-                "user" : user.id,
+                "application" : ApplicationSerializer( application).data,
+                "user" : UserSerializer( user ).data,
                 "premium" : premium
             }
             print("The app json ", appJson)
             ins = InsuranceSerializer(data=appJson)
             ins.is_valid(raise_exception=True)
-            
-            ins.save()
-            data = InsuranceSerializer(ins)
-            data['state'] = {'hasInsurance' : True, 'hasApplication' : True}
-            return JsonResponse(data, status=status.HTTP_200_OK)
+            retDict = {}
+            retDict['insurance'] = ins.validated_data
+            retDict['state'] = {'hasInsurance' : True, 'hasApplication' : True}
+            print("The return dicitonary ", retDict)
+            return JsonResponse(retDict, status=status.HTTP_200_OK)
         data = acceptedInsurance(insurance)
         data['state'] = {"hasApplication":False}
         return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
@@ -111,24 +109,21 @@ class CreateAPIVIEW(generics.GenericAPIView):
         user = getUser(request)
         application = getApplication(user.id)
         if not application:
-            return JsonResponse({"message" : "Has insurance", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_400_BADHTTP_200_OK)
+            return JsonResponse({"message" : "Does not have an application", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_400_BAD_REQUEST)
         # Get the insurance attached to the application if it exists
         insurance = getInsurance(application)
+        print("Insurance ", insurance)
         if not insurance:
             premium = getRate(application.age)
-            dict = {
-                'premium' : premium,
-                'hasInsurance' : False
-            }
-
-            dict['state'] = {'hasInsurance' : True, 'hasApplication' : True}
-            return JsonResponse({"data" : dict}, status=status.HTTP_200_OK)
+            retDict = {}
+            retDict['premium'] = premium
+            retDict['state'] = {'hasInsurance' : False, 'hasApplication' : True}
+            return JsonResponse(retDict, status=status.HTTP_200_OK)
         insData = acceptedInsurance(insurance)
         insData['hasApplication'] = True
         insData['hasInsurance'] = True
         return JsonResponse(insData, status=status.HTTP_200_OK)
     
-    def withdrawApplicatioN(self, request):
-        
+    def withdrawApplication(self, request):
         return JsonResponse({"rate" : "Here"}, status=status.HTTP_200_OK)
     
