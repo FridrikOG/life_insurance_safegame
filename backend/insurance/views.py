@@ -75,11 +75,15 @@ class CreateAPIVIEW(generics.GenericAPIView):
     def post(self, request):
         ''' Get an insurance contract '''
         user = getUser(request)
+        if not user:
+            return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
+        userJson = UserSerializer( user ).data
         data = request.data
         application = getApplication(user.id)
         if not application:
             return JsonResponse({"message" : "Has insurance", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_400_BAD_REQUEST)
         insurance = getInsurance(application)
+        applicationJson = ApplicationSerializer( application).data
         if not insurance:
             premium =getRate(application.age,'male',['cancer'])
             premium = int(premium)
@@ -88,35 +92,29 @@ class CreateAPIVIEW(generics.GenericAPIView):
             print("Insurance baby ")
             print("The user ", user.id)
             print("Application  ", application.id)
-            # appJson = {
-            #     "application" : ApplicationSerializer( application).data,
-            #     "user" : UserSerializer( user ).data,
-            #     "premium" : premium
-            # }
+            appJson = {
+                "application" : applicationJson,
+                "user" : UserSerializer( user ).data,
+                "premium" : premium
+            }
             app =  ApplicationSerializer( application).data
             use = UserSerializer(user ).data
-            print("THEUSER ", use)
-            print("THEAPP ", app)
-            use['user_id'] = user.id
-            print("The app ", application.id)
-            
-            # appJson = {
-            #     "application" : app,
-            #     "user" :  use,
-            #     "premium" : premium
-            # }
-            # ins = InsuranceSerializer(data=appJson)
-            # ins.is_valid(raise_exception=True)
-            # ins.create(ins.validated_data)
-            # ins.save()
-            
+            appJson = {
+                "application" : application.id,
+                "user" :  user.id,
+                "premium" : premium
+            }
+            ins = InsuranceSerializer(data=appJson)
+            print(" type of ins ", type(ins))
+            ins.is_valid(raise_exception=False)
+            ins.create(ins.validated_data)
             Insurance(user=user, application=application, premium=premium).save()
-            retDict = {}
-            # retDict['insurance'] = ins.validated_data
+            retDict = appJson
             retDict['state'] = {'hasInsurance' : True, 'hasApplication' : True}
-            print("The return dicitonary ", retDict)
             return JsonResponse(retDict, status=status.HTTP_200_OK)
         data = acceptedInsurance(insurance)
+        data['application'] = applicationJson
+        data['user'] = userJson
         data['state'] = {"hasApplication":True}
         data['state'] = {"hasApplication":True}
         return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
@@ -124,6 +122,10 @@ class CreateAPIVIEW(generics.GenericAPIView):
     def get(self, request):
         user = getUser(request)
         application = getApplication(user.id)
+        
+        if not user:
+            return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
+        
         if not application:
             return JsonResponse({"message" : "Does not have an application", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_400_BAD_REQUEST)
         # Get the insurance attached to the application if it exists

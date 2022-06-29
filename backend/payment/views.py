@@ -15,41 +15,71 @@ from rest_framework import status, generics, serializers
 from dateutil.relativedelta import relativedelta
 
   
+def getStateMessages():
+    state = {
+            "hasApplication": False,
+            "hasInsurance": False,
+            "hasPayment" : False
+        }
+    
+    return state
+  
 @permission_classes([AllowAny])
 class PaymentAPIVIEW(generics.GenericAPIView):
     def get(self, request):
         ''' Get payment '''
+        retDict = {}
         user = getUser(request)
+        if not user:
+            return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
         application = getApplication(user.id)
+        state = getStateMessages()
         if not application:
-            return JsonResponse({"message" : "No application found"}, status=status.HTTP_200_OK)
+            return JsonResponse({"message" : "No application found", "state" : state}, status=status.HTTP_200_OK)
         # get the insurance belonging to the user
         insurance = getInsurance(application)
+        state['hasApplication'] = True
         if not insurance:
-            return JsonResponse({"data" : {}}, status=status.HTTP_200_OK)
+            
+            return JsonResponse({"message": "No insurance found", "state" : state}, status=status.HTTP_200_OK)
         ins = InsuranceSerializer(insurance)
         hasPaid = checkHasPaid(insurance)
+        state['hasInsurance'] = True
         if hasPaid:
-            return JsonResponse({'hasPaid':True, 'paymentDue': ins.data['premium']}, status=status.HTTP_200_OK)
+            retDict['premium'] = ins.data['premium']
+            state['hasPayment'] = True
+            retDict['state'] = state
+            return JsonResponse(retDict , status=status.HTTP_200_OK)
         paymentDue = getRate(application.age)
-
-        return JsonResponse({'hasPaid':False, 'paymentDue': paymentDue}, status=status.HTTP_200_OK)
+        retDict['state'] = state
+        retDict['premium'] = paymentDue
+        return JsonResponse(retDict, status=status.HTTP_200_OK)
         
     def post(self, request):
         ''' Make payment'''
         user = getUser(request)
-
+        if not user:
+            return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
         application = getApplication(user.id)
+        state = getStateMessages()
         if not application:
-            return JsonResponse({"message" : "No application found"}, status=status.HTTP_200_OK)
+            return JsonResponse({"message" : "No application found", "state" : state}, status=status.HTTP_400_BAD_REQUEST)
         # get the insurance belonging to the user
         insurance = getInsurance(application)
+        state['hasApplication'] = True
         if not insurance:
-            return JsonResponse({"data" : {}}, status=status.HTTP_200_OK)
+            return JsonResponse({"message": "No insurance found", "state" : state}, status=status.HTTP_400_BAD_REQUEST)
         ins = InsuranceSerializer(insurance)
         hasPaid = checkHasPaid(insurance)
+        retDict = {}
+        state['hasInsurance'] = True
+        retDict['premium'] = ins.data['premium']
         if hasPaid:
-            return JsonResponse({'hasPaid':True, 'paymentDue': ins.data['premium']}, status=status.HTTP_200_OK)
+            state['hasPayment'] = True
+
+            retDict['state'] = state
+            
+            return JsonResponse(retDict, status=status.HTTP_400_BAD_REQUEST)
         
         paymentDue = getRate(application.age)
         dict = {
@@ -57,30 +87,46 @@ class PaymentAPIVIEW(generics.GenericAPIView):
             'payment': paymentDue
         }
         insData = ins.data
-        print("Ins data ", insData)
-        insData['premium'] = 28000
- 
-        print("Ins data ", insData)
-
-        print(insurance.dateCreated, type(insurance.dateCreated))
+        insData['premium'] = paymentDue
         expiryOfInsurance = dt.now() + relativedelta(years=1)
         insData['dateExpires'] = expiryOfInsurance
-    
-        
-        
         serializer = InsuranceSerializer(insurance, data=insData, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        
-        
-        
         # IF there is no payment made, lets figure out the payment due
-        
         payment = PaymentSerializer(data=dict)
         payment.is_valid(raise_exception=True)
-        # payment.save()
+        payment.save()
+        retDict['state'] = state
         
+        return JsonResponse(retDict, status=status.HTTP_200_OK)
         
-        return JsonResponse({'hasPaid':True, 'paymentDue': paymentDue}, status=status.HTTP_200_OK)
+    def delete(self, request):
+        ''' Make payment'''
+        user = getUser(request)
+        if not user:
+            return JsonResponse({"message" : "No application found", "state" : state}, status=status.HTTP_400_BAD_REQUEST)
+        application = getApplication(user.id)
+        state = getStateMessages()
+        if not application:
+            return JsonResponse({"message" : "No application found", "state" : state}, status=status.HTTP_400_BAD_REQUEST)
+        # get the insurance belonging to the user
+        insurance = getInsurance(application)
+        state['hasApplication'] = True
+        if not insurance:
+            return JsonResponse({"message": "No insurance found", "state" : state}, status=status.HTTP_400_BAD_REQUEST)
+        ins = InsuranceSerializer(insurance)
+        hasPaid = checkHasPaid(insurance)
+        retDict = {}
+        state['hasInsurance'] = True
+        retDict['premium'] = ins.data['premium']
+        if hasPaid:
+            state['hasPayment'] = True
+            retDict['state'] = state
+            hasPaid.delete()
+            
+            return JsonResponse(retDict, status=status.HTTP_200_OK)
+    
+        return JsonResponse({ "message":"Has no payment", "state":state}, status=status.HTTP_200_OK)
         
     
