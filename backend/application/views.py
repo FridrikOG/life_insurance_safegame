@@ -41,7 +41,6 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
             retData['state'] = {'hasApplication': True}
             return JsonResponse(retData, status=status.HTTP_200_OK)
         else:
-            
             retData['state'] = {'hasApplication': False}
             return JsonResponse(retData,status=status.HTTP_404_NOT_FOUND)
 

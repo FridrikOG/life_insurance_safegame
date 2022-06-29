@@ -88,21 +88,37 @@ class CreateAPIVIEW(generics.GenericAPIView):
             print("Insurance baby ")
             print("The user ", user.id)
             print("Application  ", application.id)
-            appJson = {
-                "application" : ApplicationSerializer( application).data,
-                "user" : UserSerializer( user ).data,
-                "premium" : premium
-            }
-            print("The app json ", appJson)
-            ins = InsuranceSerializer(data=appJson)
-            ins.is_valid(raise_exception=True)
+            # appJson = {
+            #     "application" : ApplicationSerializer( application).data,
+            #     "user" : UserSerializer( user ).data,
+            #     "premium" : premium
+            # }
+            app =  ApplicationSerializer( application).data
+            use = UserSerializer(user ).data
+            print("THEUSER ", use)
+            print("THEAPP ", app)
+            use['user_id'] = user.id
+            print("The app ", application.id)
+            
+            # appJson = {
+            #     "application" : app,
+            #     "user" :  use,
+            #     "premium" : premium
+            # }
+            # ins = InsuranceSerializer(data=appJson)
+            # ins.is_valid(raise_exception=True)
+            # ins.create(ins.validated_data)
+            # ins.save()
+            
+            Insurance(user=user, application=application, premium=premium).save()
             retDict = {}
-            retDict['insurance'] = ins.validated_data
+            # retDict['insurance'] = ins.validated_data
             retDict['state'] = {'hasInsurance' : True, 'hasApplication' : True}
             print("The return dicitonary ", retDict)
             return JsonResponse(retDict, status=status.HTTP_200_OK)
         data = acceptedInsurance(insurance)
-        data['state'] = {"hasApplication":False}
+        data['state'] = {"hasApplication":True}
+        data['state'] = {"hasApplication":True}
         return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
