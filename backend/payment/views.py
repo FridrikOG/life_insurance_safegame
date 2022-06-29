@@ -76,9 +76,7 @@ class PaymentAPIVIEW(generics.GenericAPIView):
         retDict['premium'] = ins.data['premium']
         if hasPaid:
             state['hasPayment'] = True
-
             retDict['state'] = state
-            
             return JsonResponse(retDict, status=status.HTTP_400_BAD_REQUEST)
         
         paymentDue = getRate(application.age)
@@ -89,16 +87,18 @@ class PaymentAPIVIEW(generics.GenericAPIView):
         insData = ins.data
         insData['premium'] = paymentDue
         expiryOfInsurance = dt.now() + relativedelta(years=1)
+        print(" The expiry of insurance ", expiryOfInsurance)
         insData['dateExpires'] = expiryOfInsurance
+        print("Update things ", insData)
         serializer = InsuranceSerializer(insurance, data=insData, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        # IF there is no payment made, lets figure out the payment due
+        # If there is no payment made, 
+        # lets figure out the payment due
         payment = PaymentSerializer(data=dict)
         payment.is_valid(raise_exception=True)
         payment.save()
         retDict['state'] = state
-        
         return JsonResponse(retDict, status=status.HTTP_200_OK)
         
     def delete(self, request):

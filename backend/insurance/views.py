@@ -38,7 +38,6 @@ def getRate(age,gender = 'male',factors = []):
     if gender=='male':
         #hazardRate=mortalityTable.loc[mortalityTable.Age == age,'Male_Hazard_Rate'].values[0]
         expectedLoss=mortalityTable.loc[mortalityTable.Age == age,'ExpectedLossMale'].values[0]
-        # print("Expected loss ", expectedLoss)
     else:
         #hazardRate=mortalityTable.loc[mortalityTable.Age == age,'Female_Hazard_Rate'].values[0]
         expectedLoss=mortalityTable.loc[mortalityTable.Age == age,'ExpectedLossFemale'].values[0]
@@ -89,16 +88,13 @@ class CreateAPIVIEW(generics.GenericAPIView):
             premium = int(premium)
             data = {'rate':premium}
             # User accepts the insurance contract
-            print("Insurance baby ")
-            print("The user ", user.id)
-            print("Application  ", application.id)
+
             appJson = {
                 "application" : applicationJson,
-                "user" : UserSerializer( user ).data,
+                "user" : UserSerializer(user).data,
                 "premium" : premium
             }
-            app =  ApplicationSerializer( application).data
-            use = UserSerializer(user ).data
+
             appJson = {
                 "application" : application.id,
                 "user" :  user.id,
@@ -122,12 +118,11 @@ class CreateAPIVIEW(generics.GenericAPIView):
     def get(self, request):
         user = getUser(request)
         application = getApplication(user.id)
-        
         if not user:
             return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
         
         if not application:
-            return JsonResponse({"message" : "Does not have an application", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({"message" : "Does not have an application", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_200_OK)
         # Get the insurance attached to the application if it exists
         insurance = getInsurance(application)
         print("Insurance ", insurance)
