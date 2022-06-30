@@ -11,6 +11,7 @@ from rest_framework.permissions import AllowAny
 from user.views import *
 from .serializers import ApplicationSerializer
 from payment.function import checkHasPaid
+import datetime
 
 def getApplication(userId):
     app = Application.objects.filter(user=userId, active=True).first()
@@ -27,8 +28,13 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
         if not userId:
             return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
         data = request.data
-        data['user'] = userId
-        item = ApplicationSerializer(data=request.data)
+        dict = {}
+        
+        dict['dob'] = data['dob']
+        dict['user'] = userId
+        print("Datetime ", datetime.datetime.now())
+        print("Dob ", dict)
+        item = ApplicationSerializer(data=dict)
         item.is_valid(raise_exception=True)
         # Check if user has an active application
         # Can only have one active application at a time

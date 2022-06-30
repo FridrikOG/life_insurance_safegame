@@ -12,7 +12,7 @@ from user.views import *
 from insurance.views import *
 from rest_framework import status, generics, serializers 
 
-from datetime import datetime as dt
+from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
 
   
@@ -25,6 +25,15 @@ def getStateMessages():
     
     return state
   
+
+def getYearFromNow():
+    expiryOfInsurance = datetime.now(timezone.utc) + relativedelta(years=1)
+    expiryOfInsurance = expiryOfInsurance.strftime("%Y-%m-%d")
+    expiryOfInsurance = datetime.strptime(str(expiryOfInsurance), "%Y-%m-%d")
+    return expiryOfInsurance
+
+ 
+
 @permission_classes([AllowAny])
 class PaymentAPIVIEW(generics.GenericAPIView):
     def get(self, request):

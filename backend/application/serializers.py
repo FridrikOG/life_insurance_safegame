@@ -4,10 +4,14 @@ from rest_framework import  serializers
 class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
-        optional_fields = ['dateCreated', 'approved', ]
-        fields = ('user','age', 'dateCreated', 'approved', 'active')
-        error_messages = {"age": {"required": "Give yourself a username"}}
+        optional_fields = [ 'dateCreated', 'approved']
+        fields = ('user', 'dateCreated', 'approved', 'active', 'dob')
+        # error_messages = {"age": {"required": "Give yourself a username"}}
     def validate(self,data):
-        if data['age'] < 1:
-            raise serializers.ValidationError("Age must be above 1")
+        print("App seria  ", data)
+        # if not data['dob']:
+        #     raise serializers.validation.ValidationError("Age must be above 18")
+        
+        # if data['age'] < 1:
+        #     raise serializers.ValidationError("Age must be above 1")
         return data

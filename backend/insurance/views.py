@@ -84,18 +84,15 @@ class CreateAPIVIEW(generics.GenericAPIView):
         insurance = getInsurance(application)
         applicationJson = ApplicationSerializer( application).data
         if not insurance:
-            premium =getRate(application.age,'male',['cancer'])
+            premium =getRate (application.age,'male',['cancer'])
             premium = int(premium)
             data = {'rate':premium}
             # User accepts the insurance contract
-
-
             appJson = {
                 "application" : application.id,
                 "user" :  user.id,
                 "premium" : premium
             }
-    
             Insurance(user=user, application=application, premium=premium).save()
             retDict = appJson
             retDict['state'] = {'hasInsurance' : True, 'hasApplication' : True}

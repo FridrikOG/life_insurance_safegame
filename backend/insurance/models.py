@@ -28,4 +28,3 @@ class Insurance(models.Model):
     dateCreated = models.DateTimeField(max_length=255, auto_now=True)
     dateApproved = models.DateTimeField(max_length=255, auto_now=True)
     dateModified = models.DateTimeField(max_length=255, auto_now_add=True)
-    
