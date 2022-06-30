@@ -12,6 +12,8 @@ from user.views import *
 from .serializers import ApplicationSerializer
 from payment.function import checkHasPaid
 import datetime
+from payment.function import *
+
 
 def getApplication(userId):
     app = Application.objects.filter(user=userId, active=True).first()
@@ -30,10 +32,11 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
         data = request.data
         dict = {}
         
+        
+        
+        
         dict['dob'] = data['dob']
         dict['user'] = userId
-        print("Datetime ", datetime.datetime.now())
-        print("Dob ", dict)
         item = ApplicationSerializer(data=dict)
         item.is_valid(raise_exception=True)
         # Check if user has an active application
@@ -111,7 +114,7 @@ class WithdrawApplicationAPIVIEW(generics.GenericAPIView):
         application = getApplication(userId)
         if not application:
             return JsonResponse({"message":"Application not found", "state": {"hasApplication" : False}}, status=status.HTTP_404_NOT_FOUND)
-
+        
         if application.active == False:
             return JsonResponse({"message":"Application is not active"}, status=status.HTTP_400_BAD_REQUEST)
         insurance = Insurance.objects.filter(application=application.id).first()
