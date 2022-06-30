@@ -9,9 +9,10 @@ from .serializers import PaymentSerializer
 from django.http import HttpResponse, JsonResponse
 import sys, os
 from user.views import *
-from insurance.views import * 
+from insurance.views import *
+from rest_framework import status, generics, serializers 
+
 from datetime import datetime as dt
-from rest_framework import status, generics, serializers
 from dateutil.relativedelta import relativedelta
 
   
@@ -85,19 +86,27 @@ class PaymentAPIVIEW(generics.GenericAPIView):
             'payment': paymentDue
         }
         insData = ins.data
-        insData['premium'] = paymentDue
         expiryOfInsurance = dt.now() + relativedelta(years=1)
-        print(" The expiry of insurance ", expiryOfInsurance)
+        expiryOfInsurance = expiryOfInsurance.strftime("%Y-%m-%d")
+        expiryOfInsurance = datetime.datetime.strptime(str(expiryOfInsurance), "%Y-%m-%d")
+        
         insData['dateExpires'] = expiryOfInsurance
-        print("Update things ", insData)
         serializer = InsuranceSerializer(insurance, data=insData, partial=True)
+        
+        insurance.dateExpires = expiryOfInsurance
+
+        
         serializer.is_valid(raise_exception=True)
+        
+        
         serializer.save()
         # If there is no payment made, 
         # lets figure out the payment due
         payment = PaymentSerializer(data=dict)
+        
         payment.is_valid(raise_exception=True)
         payment.save()
+        state['hasPayment'] = True
         retDict['state'] = state
         return JsonResponse(retDict, status=status.HTTP_200_OK)
         
@@ -121,12 +130,12 @@ class PaymentAPIVIEW(generics.GenericAPIView):
         state['hasInsurance'] = True
         retDict['premium'] = ins.data['premium']
         if hasPaid:
-            state['hasPayment'] = True
+          
             retDict['state'] = state
             hasPaid.delete()
             
             return JsonResponse(retDict, status=status.HTTP_200_OK)
     
-        return JsonResponse({ "message":"Has no payment", "state":state}, status=status.HTTP_200_OK)
+        return JsonResponse({ "message":"Has no payment", "state":state}, status=status.HTTP_400_BAD_REQUEST)
         
     

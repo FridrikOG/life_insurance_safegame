@@ -17,6 +17,6 @@ class Application(models.Model):
     age = models.IntegerField(default=0)
     approved = models.BooleanField(default=True)
     # Needs to be changed later
-    dateApproved = models.DateField(max_length=255, auto_now_add=True)
+    dateApproved = models.DateTimeField(max_length=255, auto_now_add=True)
     active = models.BooleanField(default=True)
-    dateCreated = models.DateField(max_length=255, auto_now_add=True)
+    dateCreated = models.DateTimeField(max_length=255, auto_now_add=True)

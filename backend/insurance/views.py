@@ -89,21 +89,13 @@ class CreateAPIVIEW(generics.GenericAPIView):
             data = {'rate':premium}
             # User accepts the insurance contract
 
-            appJson = {
-                "application" : applicationJson,
-                "user" : UserSerializer(user).data,
-                "premium" : premium
-            }
 
             appJson = {
                 "application" : application.id,
                 "user" :  user.id,
                 "premium" : premium
             }
-            ins = InsuranceSerializer(data=appJson)
-            print(" type of ins ", type(ins))
-            ins.is_valid(raise_exception=False)
-            ins.create(ins.validated_data)
+    
             Insurance(user=user, application=application, premium=premium).save()
             retDict = appJson
             retDict['state'] = {'hasInsurance' : True, 'hasApplication' : True}
@@ -111,7 +103,6 @@ class CreateAPIVIEW(generics.GenericAPIView):
         data = acceptedInsurance(insurance)
         data['application'] = applicationJson
         data['user'] = userJson
-        data['state'] = {"hasApplication":True}
         data['state'] = {"hasApplication":True}
         return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
 

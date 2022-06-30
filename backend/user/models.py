@@ -69,7 +69,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False, null=True)
     is_superuser = models.BooleanField(default=False, null=True)
     admin = models.BooleanField(default=False)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'email'
     # REQUIRED_FIELDS = [firstName, lastName, email]
