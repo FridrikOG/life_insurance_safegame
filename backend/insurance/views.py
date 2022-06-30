@@ -17,6 +17,9 @@ from payment.function import checkHasPaid
 import datetime
 from .serializers import InsuranceSerializer
 from django.utils.timezone import make_aware
+from payment.function import *
+
+
 
 COVER_AMOUNT=2500000 
 BASE_RATE=0.01
@@ -66,6 +69,8 @@ def acceptedInsurance(insurance):
     else:
         insData['hasPaid'] = False
     return insData
+
+
     
 @permission_classes([AllowAny])
 class CreateAPIVIEW(generics.GenericAPIView):
@@ -76,6 +81,8 @@ class CreateAPIVIEW(generics.GenericAPIView):
         user = getUser(request)
         if not user:
             return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
+        
+        
         userJson = UserSerializer( user ).data
         data = request.data
         application = getApplication(user.id)
@@ -83,8 +90,13 @@ class CreateAPIVIEW(generics.GenericAPIView):
             return JsonResponse({"message" : "Has insurance", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_400_BAD_REQUEST)
         insurance = getInsurance(application)
         applicationJson = ApplicationSerializer( application).data
+        
+        # Time to get the age
+        
+        age = getAge(applicationJson['dob'])
+        
         if not insurance:
-            premium =getRate (application.age,'male',['cancer'])
+            premium =getRate (age,'male',['cancer'])
             premium = int(premium)
             data = {'rate':premium}
             # User accepts the insurance contract
@@ -114,8 +126,9 @@ class CreateAPIVIEW(generics.GenericAPIView):
         # Get the insurance attached to the application if it exists
         insurance = getInsurance(application)
         print("Insurance ", insurance)
+        age = getAge(application.dob)
         if not insurance:
-            premium = getRate(application.age)
+            premium = getRate(age)
             retDict = {}
             retDict['premium'] = premium
             retDict['state'] = {'hasInsurance' : False, 'hasApplication' : True}

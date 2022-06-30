@@ -17,9 +17,7 @@ def getYearFromNow():
 # Create your models here.
 class Application(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    dob = models.DateField()
-    # Needs to be changed later
+    dob = models.DateTimeField()
     approved = models.BooleanField(default=True)
     dateApproved = models.DateTimeField(max_length=255, auto_now=True)
     active = models.BooleanField(default=True)

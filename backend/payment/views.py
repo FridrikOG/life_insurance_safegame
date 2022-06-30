@@ -22,7 +22,6 @@ def getStateMessages():
             "hasInsurance": False,
             "hasPayment" : False
         }
-    
     return state
   
 
@@ -103,7 +102,6 @@ class PaymentAPIVIEW(generics.GenericAPIView):
         serializer = InsuranceSerializer(insurance, data=insData, partial=True)
         
         insurance.dateExpires = expiryOfInsurance
-
         
         serializer.is_valid(raise_exception=True)
         

@@ -108,10 +108,10 @@ class WithdrawApplicationAPIVIEW(generics.GenericAPIView):
         userId = getUserId(request)
         if not userId:
             return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
-        applications = Application.objects.filter(user_id=userId, active=True)
-        if not applications:
+        application = getApplication(userId)
+        if not application:
             return JsonResponse({"message":"Application not found", "state": {"hasApplication" : False}}, status=status.HTTP_404_NOT_FOUND)
-        application = applications.first()
+
         if application.active == False:
             return JsonResponse({"message":"Application is not active"}, status=status.HTTP_400_BAD_REQUEST)
         insurance = Insurance.objects.filter(application=application.id).first()
@@ -120,10 +120,11 @@ class WithdrawApplicationAPIVIEW(generics.GenericAPIView):
             return JsonResponse({"message":"Already belongs to an Insurance"}, status=status.HTTP_400_BAD_REQUEST) 
         application.active = False
         application.save()
-        app = ApplicationSerializer(application)
+        
+        app = ApplicationSerializer(application).data
         retData = {}
-        retData['application'] = app.data
-        retData['state'] = {'hasApplication': False}
+        retData['application'] = app
+        # retData['state'] = {'hasApplication': False}
         return JsonResponse(retData, status=status.HTTP_200_OK)
         
 
