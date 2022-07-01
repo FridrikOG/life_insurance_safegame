@@ -59,7 +59,8 @@ class PaymentAPIVIEW(generics.GenericAPIView):
             state['hasPayment'] = True
             retDict['state'] = state
             return JsonResponse(retDict , status=status.HTTP_200_OK)
-        paymentDue = getRate(application.age)
+        age = getAge(application.dob)
+        paymentDue = getRate(age)
         retDict['state'] = state
         retDict['premium'] = paymentDue
         return JsonResponse(retDict, status=status.HTTP_200_OK)
@@ -87,17 +88,14 @@ class PaymentAPIVIEW(generics.GenericAPIView):
             state['hasPayment'] = True
             retDict['state'] = state
             return JsonResponse(retDict, status=status.HTTP_400_BAD_REQUEST)
-        
-        paymentDue = getRate(application.age)
+        age = getAge(application.dob)
+        paymentDue = getRate(age)
         dict = {
             'insurance': insurance.id,
             'payment': paymentDue
         }
         insData = ins.data
-        expiryOfInsurance = dt.now() + relativedelta(years=1)
-        expiryOfInsurance = expiryOfInsurance.strftime("%Y-%m-%d")
-        expiryOfInsurance = datetime.datetime.strptime(str(expiryOfInsurance), "%Y-%m-%d")
-        
+        expiryOfInsurance = getYearFromNow()
         insData['dateExpires'] = expiryOfInsurance
         serializer = InsuranceSerializer(insurance, data=insData, partial=True)
         
