@@ -93,9 +93,7 @@ class CreateAPIVIEW(generics.GenericAPIView):
         
         # Time to get the age
         
-        age = getAge(applicationJson['dob'])
-        
-        
+        age = getAge(application.dob)
         if not insurance:
             premium =getRate (age,'male',['cancer'])
             premium = int(premium)
