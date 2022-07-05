@@ -18,10 +18,10 @@ import datetime
 from .serializers import InsuranceSerializer
 from django.utils.timezone import make_aware
 from payment.function import *
+from user.states import *
 
 
-
-COVER_AMOUNT=2500000 
+COVER_AMOUNT=25000000 
 BASE_RATE=0.01
 # Create your views here.
 def getTables():
@@ -78,21 +78,23 @@ class CreateAPIVIEW(generics.GenericAPIView):
         self.serializer = None
     def post(self, request):
         ''' Get an insurance contract '''
+        
+        state = getStateMessages()
+        
         user = getUser(request)
         if not user:
-            return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
+            return JsonResponse({"message" : "User not authenticated", "state":state },status=status.HTTP_401_UNAUTHORIZED)
         
         
         userJson = UserSerializer( user ).data
         data = request.data
         application = getApplication(user.id)
         if not application:
-            return JsonResponse({"message" : "Has insurance", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({"message" : "Has insurance", "state":state}, status=status.HTTP_400_BAD_REQUEST)
         insurance = getInsurance(application)
         applicationJson = ApplicationSerializer( application).data
-        
+        state['hasApplication'] = True
         # Time to get the age
-        
         age = getAge(application.dob)
         if not insurance:
             premium =getRate (age,'male',['cancer'])
@@ -106,36 +108,49 @@ class CreateAPIVIEW(generics.GenericAPIView):
             }
             Insurance(user=user, application=application, premium=premium).save()
             retDict = appJson
-            retDict['state'] = {'hasInsurance' : True, 'hasApplication' : True}
+            state['hasInsurance'] = True 
+            
+            retDict['state'] = state
             return JsonResponse(retDict, status=status.HTTP_200_OK)
         data = acceptedInsurance(insurance)
         data['application'] = applicationJson
         data['user'] = userJson
-        data['state'] = {"hasApplication":True}
+        hasPayment = checkHasPaid(insurance)
+        if hasPayment:
+            state['hasPayment'] = True
+        data['state'] = state
         return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         user = getUser(request)
         application = getApplication(user.id)
+        retDict = {}
+        state = getStateMessages()
         if not user:
-            return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
+            return JsonResponse({"message" : "User not authenticated", "state" : state},status=status.HTTP_401_UNAUTHORIZED)
         
         if not application:
-            return JsonResponse({"message" : "Does not have an application", "state":{"hasApplication":False, "hasInsurance":False}}, status=status.HTTP_200_OK)
-        # Get the insurance attached to the application if it exists
+            return JsonResponse({"message" : "Does not have an application", "state":state}, status=status.HTTP_200_OK)
+        state['hasApplication'] = True
         insurance = getInsurance(application)
-        print("Insurance ", insurance)
         age = getAge(application.dob)
         if not insurance:
             premium = getRate(age)
             retDict = {}
             retDict['premium'] = premium
-            retDict['state'] = {'hasInsurance' : False, 'hasApplication' : True}
+            # retDict['state'] = {'hasInsurance' : False, 'hasApplication' : True}
+            retDict['state'] = state
             return JsonResponse(retDict, status=status.HTTP_200_OK)
+        state['hasInsurance'] = True
         insData = acceptedInsurance(insurance)
-        insData['hasApplication'] = True
-        insData['hasInsurance'] = True
-        return JsonResponse(insData, status=status.HTTP_200_OK)
+        retData = insData
+        
+        
+        if checkHasPaid(insurance):
+            state['hasPayment'] = True
+        retData['state'] = state
+        
+        return JsonResponse(retData, status=status.HTTP_200_OK)
     
     def withdrawApplication(self, request):
         return JsonResponse({"rate" : "Here"}, status=status.HTTP_200_OK)

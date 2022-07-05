@@ -1,18 +1,17 @@
 from django.shortcuts import render
 from django.shortcuts import render
-from logging import raiseExceptions
 from re import T
 from insurance.models import Insurance
 from .models import *
-from django.http import HttpResponse, JsonResponse
+from django.http import  JsonResponse
 from rest_framework import status, generics, serializers
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
 from user.views import *
 from .serializers import ApplicationSerializer
 from payment.function import checkHasPaid
-import datetime
 from payment.function import *
+from user.states import *
 
 
 def getApplication(userId):
@@ -25,16 +24,13 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
         self.serializer = None
     def post(self, request):
         ''' Get an insurance contract '''
+        state = getStateMessages()
         userId = getUserId(request)
         # userId will be false if the user is not logged in
         if not userId:
             return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
         data = request.data
         dict = {}
-        
-        
-        
-        
         dict['dob'] = data['dob']
         dict['user'] = userId
         item = ApplicationSerializer(data=dict)
@@ -47,15 +43,17 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
         if item.is_valid():
             item.save()
             retData['application'] = item.data
-            retData['state'] = {'hasApplication': True}
+            state['hasApplication'] = True
+            retData['state'] = state
             return JsonResponse(retData, status=status.HTTP_200_OK)
         else:
-            retData['state'] = {'hasApplication': False}
+            retData['state'] = state
             return JsonResponse(retData,status=status.HTTP_404_NOT_FOUND)
 
     def get(self, request):
         ''' Get the current active application '''
         userId = getUserId(request)
+        state = getStateMessages()
         if not userId:
             return JsonResponse({"message" : "User not authenticated"},status=status.HTTP_401_UNAUTHORIZED)
        # checking for the parameters from the URL
@@ -66,7 +64,8 @@ class ApplicationAPIVIEW(generics.GenericAPIView):
         if applications:
             application = applications.first()
             retData['application'] = ApplicationSerializer(application).data
-            retData['state'] = {'hasApplication': True}
+            state['hasApplication'] = True
+            retData['state'] = state
             return JsonResponse(retData, status=status.HTTP_200_OK)
         else:
             

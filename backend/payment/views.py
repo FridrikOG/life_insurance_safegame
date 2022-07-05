@@ -14,16 +14,9 @@ from rest_framework import status, generics, serializers
 
 from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
+from user.states import *
+  
 
-  
-def getStateMessages():
-    state = {
-            "hasApplication": False,
-            "hasInsurance": False,
-            "hasPayment" : False
-        }
-    return state
-  
 
 def getYearFromNow():
     expiryOfInsurance = datetime.now(timezone.utc) + relativedelta(years=1)

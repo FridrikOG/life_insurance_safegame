@@ -8,4 +8,5 @@ def getTimeStamp(date):
 class Payment(models.Model):
     insurance = models.ForeignKey(Insurance, on_delete=models.CASCADE)
     payment = models.IntegerField( default=0)
+    
     datePaid = models.DateTimeField(auto_now_add=True)

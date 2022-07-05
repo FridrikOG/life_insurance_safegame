@@ -12,6 +12,7 @@ def getYearFromNow():
     expiryOfInsurance = expiryOfInsurance.strftime("%Y-%m-%d")
     expiryOfInsurance = datetime.strptime(str(expiryOfInsurance), "%Y-%m-%d")
     return expiryOfInsurance
+
 def getCurrentDate():
     gmt = time.gmtime()
     ts = calendar.timegm(gmt)
