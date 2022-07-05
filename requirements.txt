@@ -1,4 +1,4 @@
-Python == 3.10.5
+python == 3.10.5
 numpy== 1.22
 pip == 22.1.2 
 asgiref==3.5.2
