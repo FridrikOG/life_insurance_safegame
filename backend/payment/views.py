@@ -15,7 +15,7 @@ from rest_framework import status, generics, serializers
 from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
 from user.states import *
-  
+import requests
 
 
 def getYearFromNow():
@@ -97,15 +97,48 @@ class PaymentAPIVIEW(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         
         
-        serializer.save()
+        
         # If there is no payment made, 
         # lets figure out the payment due
         payment = PaymentSerializer(data=dict)
         
         payment.is_valid(raise_exception=True)
-        payment.save()
+        if False:
+            serializer.save()
+            payment.save()
+        
+        # After payment is saved we save it into the blockchain
+        userId = user.id
+        insuranceId = insurance.id
+        print("User id ", userId)
+        
+        blockchainDict = {
+        "headers" : {
+            "type" : "insurance"
+        }, 
+        "body": {
+            "userId" : user.id,
+            "insuranceId" : insurance.id
+        }
+    }       
+        
         state['hasPayment'] = True
         retDict['state'] = state
+        
+        # local
+        url = 'http://127.0.0.1:5000/block'
+        # remote
+        # url = 'http://185.3.94.49:80/blocks'
+        r = requests.post(url, json=blockchainDict)
+        state['onBlockchain'] = True
+        if r.status_code != 200:
+            state['onBlockchain'] = False
+        
+        print("Status code ", r.status_code) # 200 (hopefully)
+        
+        print("The json " , r.json())
+        retDict['blockchainData'] = r.json()
+        
         return JsonResponse(retDict, status=status.HTTP_200_OK)
         
     def delete(self, request):
