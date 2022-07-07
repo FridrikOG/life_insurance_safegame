@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-python = "==3.10.5"
 numpy = "==1.22"
 asgiref = "==3.5.2"
 astroid = "==2.11.6"
