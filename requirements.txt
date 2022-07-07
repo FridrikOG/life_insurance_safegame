@@ -4,6 +4,7 @@ appdirs==1.4.4
 asgiref==3.5.2
 astroid==2.11.6
 autopep8==1.5.4
+backports.entry-points-selectable==1.1.1
 base58==2.1.1
 billiard==3.6.4.0
 boto3==1.24.12
