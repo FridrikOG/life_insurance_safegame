@@ -11,7 +11,7 @@ pip install virtualenv
 virtualenv env
 
 Mac:
-source mypython/bin/activate
+source env/bin/activate
 Windows:
 mypthon\Scripts\activate
 
