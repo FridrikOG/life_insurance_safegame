@@ -53,7 +53,7 @@ pika==1.2.0
 pipenv==2022.6.7
 platformdirs==2.5.2
 prompt-toolkit==3.0.26
-psycopg2-binary==2.9.3
+psycopg2-binary
 pycodestyle==2.6.0
 PyJWT==2.4.0
 pylint==2.14.3
