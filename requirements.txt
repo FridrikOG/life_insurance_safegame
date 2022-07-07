@@ -80,3 +80,4 @@ websockets==10.2
 whitenoise==6.2.0
 wrapt==1.14.1
 xrpl-py==1.4.0
+gunicorn==20.1.0
