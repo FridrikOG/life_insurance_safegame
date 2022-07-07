@@ -1,2 +1,0 @@
-web: gunicorn squid.wsgi
-
