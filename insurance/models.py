@@ -25,7 +25,7 @@ class Insurance(models.Model):
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     premium = models.IntegerField()
-    dateExpires = models.DateTimeField(max_length=255, default= getYearFromNow())
+    dateExpires = models.DateTimeField(max_length=255, default= None)
     dateCreated = models.DateTimeField(max_length=255, auto_now=True)
     dateApproved = models.DateTimeField(max_length=255, auto_now=True)
     dateModified = models.DateTimeField(max_length=255, auto_now_add=True)
