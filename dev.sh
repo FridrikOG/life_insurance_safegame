@@ -1,1 +1,1 @@
-pipenv run python ./backend/manage.py runserver
+pipenv run python manage.py runserver
