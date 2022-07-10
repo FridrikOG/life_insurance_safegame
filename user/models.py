@@ -45,7 +45,6 @@ class UserManager(BaseUserManager):
         data = {
             "email": email,
             "password": password,
-            "username": "toti_admin",
             "firstname": "admin",
             "lastname": "adminsson",
             "imgURL": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNdq0Qk9zGGQCwzrg_p-S9CLhUsxj0JlvCzkdHs4tyl0XrwjROh2KPX9B_5LQVbe4dy2Y&usqp=CAU"

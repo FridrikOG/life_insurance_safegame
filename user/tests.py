@@ -14,7 +14,6 @@ class UserTestCase(SimpleTestCase):
             "email": "test1@gmail.com",
             "password": "test1234",
             "password2": "test1234",
-            "username": "test1",
             "firstname": "test12s",
             "lastname": "test12",
             "imgURL": "IMAGE_URL"
@@ -59,7 +58,6 @@ class UserTestCase(SimpleTestCase):
             "email": "test12@gmail.com",
             "password": "test1234",
             "password2": "test1234",
-            "username": "test12",
             "firstname": "test12s",
             "lastname": "test12",
             "imgURL": "IMAGE_URL"
@@ -120,7 +118,6 @@ class UserTestCase(SimpleTestCase):
             "email": "test1@gmail.com",
             "password": "test1234",
             "password2": "test1234",
-            "username": "test1",
             "firstname": "test1",
             "lastname": "test1",
             "imgURL": "IMAGE_URL"
