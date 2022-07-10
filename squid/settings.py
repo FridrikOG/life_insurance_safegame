@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'payment.apps.PaymentConfig',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'reset_migrations', 
 
 ]
 
