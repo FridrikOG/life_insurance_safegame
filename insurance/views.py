@@ -27,9 +27,9 @@ BASE_RATE=0.01
 # Create your views here.
 def getTables():
     print("PWD ", os.getcwd())
-    mortalityTable=pd.read_csv('backend/insurance/MortalityTable.csv',sep=';')
+    mortalityTable=pd.read_csv('insurance/MortalityTable.csv',sep=';')
     mortalityTable.head()
-    riskLoads=pd.read_csv('backend/insurance/RiskLoads.csv',sep=';')
+    riskLoads=pd.read_csv('insurance/RiskLoads.csv',sep=';')
     riskLoads.head()
     riskLoads
     mortalityTable['ExpectedLossMale']=mortalityTable['Male_Hazard_Rate']*COVER_MULTIPLIER
