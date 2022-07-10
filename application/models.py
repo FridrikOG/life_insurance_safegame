@@ -9,11 +9,6 @@ from dateutil.relativedelta import relativedelta
 
 
 
-def getYearFromNow():
-    expiryOfInsurance = datetime.now(timezone.utc)
-    expiryOfInsurance = datetime.strptime(str(expiryOfInsurance), "%Y-%m-%d")
-    return expiryOfInsurance
-
 # Create your models here.
 class Application(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
