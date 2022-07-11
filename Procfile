@@ -1,1 +1,1 @@
-web: gunicorn squid.wsgi
+web: gunicorn squid.wsgi.application
