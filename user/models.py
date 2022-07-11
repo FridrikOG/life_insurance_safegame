@@ -64,6 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     firstname = models.CharField(max_length=255)
     lastname = models.CharField(max_length=255)
     imgURL = models.CharField(max_length=999, blank=True)
+    username = models.CharField(max_length=255, default='')
     active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False, null=True)
     is_superuser = models.BooleanField(default=False, null=True)
@@ -85,7 +86,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __setUserAttributes__(self, data):
         self.email = data['email']
         self.set_password(data['password'])
-
         self.firstname = data['firstname']
         self.lastname = data['lastname']
         self.imgURL = data['imgURL']
