@@ -86,7 +86,8 @@ TEMPLATES = [
 
 AUTH_USER_MODEL = 'user.User'
 
-WSGI_APPLICATION = 'squid.wsgi'
+# For production use only
+WSGI_APPLICATION = 'wsgi.squid'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
