@@ -107,7 +107,7 @@ WSGI_APPLICATION = 'squid.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'ftxybkan',
         'USER': 'ftxybkan',
         'PASSWORD': 'u9__2EYiyjn4qWHrpjT8QQsMrSPu31u4',
