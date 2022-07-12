@@ -56,6 +56,8 @@ class UserManager(BaseUserManager):
 # User
 
 
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     # In AbstractBaseUser : id, password, last_login
     email = models.EmailField(max_length=255, unique=True)
@@ -64,7 +66,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     firstname = models.CharField(max_length=255)
     lastname = models.CharField(max_length=255)
     imgURL = models.CharField(max_length=999, blank=True)
-    username = models.CharField(max_length=255, default='', unique =False)
+    # username = models.CharField(max_length=255, default='', unique =False)
     active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False, null=True)
     is_superuser = models.BooleanField(default=False, null=True)
