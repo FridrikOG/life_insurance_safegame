@@ -44,5 +44,6 @@ urlpatterns = [
     path(f'{PREFIX}insurance/', include('insurance.urls')),
     path(f'{PREFIX}application/', include('application.urls')),
     path(f'{PREFIX}payment/', include('payment.urls')),
+    path(f'{PREFIX}package/', include('package.urls')),
 
 ]

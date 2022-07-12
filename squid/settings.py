@@ -41,11 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #
     'user.apps.UserConfig',
     'application.apps.ApplicationConfig',
     'insurance.apps.InsuranceConfig',
     'payment.apps.PaymentConfig',
+    'package.apps.PackageConfig',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'reset_migrations', 
