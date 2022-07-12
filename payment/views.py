@@ -42,7 +42,6 @@ class PaymentAPIVIEW(generics.GenericAPIView):
         insurance = getInsurance(application)
         state['hasApplication'] = True
         if not insurance:
-            
             return JsonResponse({"message": "No insurance found", "state" : state}, status=status.HTTP_200_OK)
         ins = InsuranceSerializer(insurance)
         hasPaid = checkHasPaid(insurance)
@@ -91,12 +90,8 @@ class PaymentAPIVIEW(generics.GenericAPIView):
         expiryOfInsurance = getYearFromNow()
         insData['dateExpires'] = expiryOfInsurance
         serializer = InsuranceSerializer(insurance, data=insData, partial=True)
-        
         insurance.dateExpires = expiryOfInsurance
-        
         serializer.is_valid(raise_exception=True)
-        
-        
         
         # If there is no payment made, 
         # lets figure out the payment due
@@ -121,7 +116,6 @@ class PaymentAPIVIEW(generics.GenericAPIView):
             "insuranceId" : insurance.id
         }
     }       
-        
         state['hasPayment'] = True
         retDict['state'] = state
         
@@ -134,11 +128,7 @@ class PaymentAPIVIEW(generics.GenericAPIView):
         state['onBlockchain'] = True
         if r.status_code != 200:
             state['onBlockchain'] = False
-            print("Failed to add to blockchain")
             return JsonResponse(retDict, status=status.HTTP_200_OK)
-        print("Status code ", r.status_code) # 200 (hopefully)
-        
-        print("The json " , r.json())
         retDict['blockchainData'] = r.json()
         
         return JsonResponse(retDict, status=status.HTTP_200_OK)
@@ -163,12 +153,8 @@ class PaymentAPIVIEW(generics.GenericAPIView):
         state['hasInsurance'] = True
         retDict['premium'] = ins.data['premium']
         if hasPaid:
-          
             retDict['state'] = state
             hasPaid.delete()
-            
             return JsonResponse(retDict, status=status.HTTP_200_OK)
     
-        return JsonResponse({ "message":"Has no payment", "state":state}, status=status.HTTP_400_BAD_REQUEST)
-        
-    
+        return JsonResponse({ "message":"Has no payment", "state":state}, status=status.HTTP_400_BAD_REQUEST)    
