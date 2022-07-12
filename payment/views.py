@@ -126,14 +126,16 @@ class PaymentAPIVIEW(generics.GenericAPIView):
         retDict['state'] = state
         
         # local
-        url = 'http://127.0.0.1:5000/block'
+        # url = 'http://127.0.0.1:5000/block'
         # remote
-        # url = 'http://185.3.94.49:80/blocks'
+        url = 'http://185.3.94.49:80/block'
+        
         r = requests.post(url, json=blockchainDict)
         state['onBlockchain'] = True
         if r.status_code != 200:
             state['onBlockchain'] = False
-        
+            print("Failed to add to blockchain")
+            return JsonResponse(retDict, status=status.HTTP_200_OK)
         print("Status code ", r.status_code) # 200 (hopefully)
         
         print("The json " , r.json())
