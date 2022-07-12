@@ -1,2 +1,2 @@
 release: python manage.py migrate
-web: gunicorn squid.wsgi
+web: gunicorn squid.wsgi.application
