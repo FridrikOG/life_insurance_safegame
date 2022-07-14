@@ -1,3 +1,4 @@
+from insurance.serializers import InsuranceSerializer
 from .models import Package
 from insurance.models import Insurance
 from rest_framework import  serializers
@@ -11,13 +12,14 @@ from user.serializers import UserSerializer
 class PackageSerializer(serializers.ModelSerializer):
     # user = UserSerializer()
     # user = serializers.RelatedField(read_only=True)
-    #  team = serializers.RelatedField()
+    # insurances = InsuranceSerializer()
     # application = ApplicationSerializer()
     # application = serializers.RelatedField(read_only=True)
     class Meta:
         model = Package
-        optional_fields = ['dateCreated', 'dateApproved', 'dateExpires']
-        fields = ('insurances', 'soldFor')
+        optional_fields = []
+        fields = ('insurances', 'soldFor', 'dateCreated', 'dateApproved', 'dateModified')
+
     
     def create(self, validated_data):
         package = Package(**validated_data)

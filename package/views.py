@@ -2,6 +2,7 @@ from django.shortcuts import render
 from logging import raiseExceptions
 from re import T
 from application.serializers import ApplicationSerializer
+from package.serializer import PackageSerializer
 from user.serializers import UserSerializer
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status, generics, serializers
@@ -20,6 +21,8 @@ from user.states import *
 from .models import Package
 from django.db.models import Sum
 from math import floor
+import json
+
 
 INSURANCE_IN_PACKAGE = 2
 OUR_CUT  = 0.1
@@ -28,8 +31,6 @@ def createPackage():
     # This function really does not need to be very efficient
     # But needs to be clear and for the variables 
     insurances = Insurance.objects.filter(isPackaged=False)
-    print("Count ", INSURANCE_IN_PACKAGE)
-    print("Count insurance ", insurances.count())
     totalPrice = 0
     # If there are at least the amount of Insurance in a package
     if insurances.count() >= INSURANCE_IN_PACKAGE:
@@ -37,7 +38,6 @@ def createPackage():
         # Djang model sum
         sum = insLis.aggregate(Sum('premium'))
         # Now let's add the premium
-       
         sum = sum['premium__sum'] * (1.0+OUR_CUT)
         sum = floor(sum)
         package = Package(soldFor=sum)
@@ -56,19 +56,20 @@ class PackageView(generics.GenericAPIView):
         self.serializer = None
     def get(self, request):
         ''' Get all package insurances '''
-        
-        # package = Package(soldFor=500)
-        # ins = Insurance.objects.get(id=2)
-        # # Save the package so we can add the associated packages
-        # package.save()
-        # package.insurances.add(ins)
+        # This is better than it looks, this barely takes any time, but always
+        # gets called when a user gets available packages
         ret = True
         while ret:
             ret = createPackage()
-            
         
-        
-        return JsonResponse({}, status=status.HTTP_200_OK)
+        packages = Package.objects.all()
+        packageSer = PackageSerializer(data=packages, many=True)
+        packageSer.is_valid()
+        data = packageSer.data
+        packages = json.loads(json.dumps(data))
+        dict = {}
+        print("Data ", packages)
+        return JsonResponse({"packages": packages}, status=status.HTTP_200_OK)
 
     def post(self, request):
         ''' Create a new package  '''
