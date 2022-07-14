@@ -89,18 +89,19 @@ class PaymentAPIVIEW(generics.GenericAPIView):
         insData = ins.data
         expiryOfInsurance = getYearFromNow()
         insData['dateExpires'] = expiryOfInsurance
-        serializer = InsuranceSerializer(insurance, data=insData, partial=True)
+        insSerializer = InsuranceSerializer(insurance, data=insData, partial=True)
         insurance.dateExpires = expiryOfInsurance
-        serializer.is_valid(raise_exception=True)
+        insSerializer.isPaid = True
+        insSerializer.is_valid(raise_exception=True)
         
         # If there is no payment made, 
         # lets figure out the payment due
         payment = PaymentSerializer(data=dict)
         
         payment.is_valid(raise_exception=True)
-        if False:
-            serializer.save()
-            payment.save()
+       
+        insSerializer.save()
+        payment.save()
         
         # After payment is saved we save it into the blockchain
         userId = user.id

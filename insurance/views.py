@@ -79,14 +79,10 @@ class CreateAPIVIEW(generics.GenericAPIView):
         self.serializer = None
     def post(self, request):
         ''' Get an insurance contract '''
-        
         state = getStateMessages()
-        
         user = getUser(request)
         if not user:
             return JsonResponse({"message" : "User not authenticated", "state":state },status=status.HTTP_401_UNAUTHORIZED)
-        
-        
         userJson = UserSerializer( user ).data
         data = request.data
         application = getApplication(user.id)
@@ -109,8 +105,7 @@ class CreateAPIVIEW(generics.GenericAPIView):
             }
             Insurance(user=user, application=application, premium=premium).save()
             retDict = appJson
-            state['hasInsurance'] = True 
-            
+            state['hasInsurance'] = True
             retDict['state'] = state
             return JsonResponse(retDict, status=status.HTTP_200_OK)
         data = acceptedInsurance(insurance)

@@ -7,4 +7,5 @@ from . import views
 # Pattern matching
 urlpatterns = [
     path('', PackageView.as_view(), name=''),
+    path('<str:packageId>/', PackageView.as_view(), name=''),
 ]

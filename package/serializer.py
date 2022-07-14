@@ -18,7 +18,7 @@ class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
         optional_fields = []
-        fields = ('insurances', 'soldFor', 'dateCreated', 'dateApproved', 'dateModified')
+        fields = ('insurances', 'price', 'dateCreated', 'dateApproved', 'dateModified', 'isSold')
 
     
     def create(self, validated_data):

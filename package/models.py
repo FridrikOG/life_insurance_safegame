@@ -10,8 +10,9 @@ from insurance.models import Insurance
 # Create your models here.
 # Create your models here.
 class Package(models.Model):
-    soldFor = models.IntegerField(default=0)
+    price = models.IntegerField(default=0)
     dateCreated = models.DateTimeField(max_length=255, auto_now=True)
     dateApproved = models.DateTimeField(max_length=255, auto_now=True)
     dateModified = models.DateTimeField(max_length=255, auto_now_add=True)
+    isSold = models.BooleanField(default=False)
     insurances = models.ManyToManyField(Insurance, blank=True)
