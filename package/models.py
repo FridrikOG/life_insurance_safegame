@@ -16,3 +16,4 @@ class Package(models.Model):
     dateModified = models.DateTimeField(max_length=255, auto_now_add=True)
     isSold = models.BooleanField(default=False)
     insurances = models.ManyToManyField(Insurance, blank=True)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)

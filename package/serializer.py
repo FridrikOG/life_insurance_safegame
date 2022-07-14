@@ -17,8 +17,8 @@ class PackageSerializer(serializers.ModelSerializer):
     # application = serializers.RelatedField(read_only=True)
     class Meta:
         model = Package
-        optional_fields = []
-        fields = ('insurances', 'price', 'dateCreated', 'dateApproved', 'dateModified', 'isSold')
+        optional_fields = ['dateCreated', 'dateApproved', 'dateModified', 'isSold', 'user']
+        fields = ('id', 'insurances', 'price', 'dateCreated', 'dateApproved', 'dateModified', 'isSold', 'user')
 
     
     def create(self, validated_data):

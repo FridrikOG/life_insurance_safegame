@@ -73,4 +73,58 @@ class PackageView(generics.GenericAPIView):
         ''' Pay for a package  '''
         print("The id ", packageId)
         
-        return JsonResponse({}, status=status.HTTP_400_BAD_REQUEST)
+        userId = getUser(request)
+        
+        thePackage = Package.objects.filter(id=packageId)
+        
+        
+        if not thePackage:
+            return JsonResponse({"message": "Package not found"}, status=status.HTTP_400_BAD_REQUEST)    
+        
+        thePackage = thePackage[0]
+        
+        if thePackage.isSold:
+            return JsonResponse({"message": "Package already sold "}, status=status.HTTP_400_BAD_REQUEST)    
+        thePackage.user = userId
+        thePackage.isSold = True
+        thePackage.save()
+        
+        pack = PackageSerializer(thePackage)
+        print("The pack ", pack)
+
+        retData = pack.data
+        print("The data ", retData)
+        return JsonResponse(retData, status=status.HTTP_200_OK)
+
+    def delete(self, request, packageId):
+        ''' Pay for a package  '''
+        print("The id ", packageId)
+        
+        user = getUser(request)
+        
+        thePackage = Package.objects.filter(id=packageId)
+        
+        
+        if not thePackage:
+            return JsonResponse({"message": "Package not found"}, status=status.HTTP_400_BAD_REQUEST)    
+        
+        thePackage = thePackage[0]
+        
+        if not thePackage.isSold:
+            return JsonResponse({"message": "Package is not sold yet "}, status=status.HTTP_400_BAD_REQUEST)  
+        
+        print("The comparison ", thePackage.user, "The user id ", user.id)
+        
+        if thePackage.user != user:
+            return JsonResponse({"message": "Package does not belong to user "}, status=status.HTTP_400_BAD_REQUEST)  
+        thePackage.user = None
+        thePackage.isSold = False
+        thePackage.save()
+        
+        
+        package = Package.objects.get(id=packageId)
+        pack = PackageSerializer(package)
+        
+        retData = pack.data
+        
+        return JsonResponse(retData, status=status.HTTP_200_OK)
