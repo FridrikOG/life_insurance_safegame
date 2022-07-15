@@ -65,10 +65,6 @@ def acceptedInsurance(insurance):
     hasBeenPaid = checkHasPaid(insurance)
     insurance = InsuranceSerializer(insurance)
     insData = insurance.data
-    if hasBeenPaid:
-        insData['hasPaid'] = True
-    else:
-        insData['hasPaid'] = False
     return insData
 
 

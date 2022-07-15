@@ -11,8 +11,8 @@ class InsuranceSerializer(serializers.ModelSerializer):
     # application = serializers.RelatedField(read_only=True)
     class Meta:
         model = Insurance
-        optional_fields = ['user_id','dateCreated', 'dateApproved', 'dateExpires', 'isPaid']
-        fields = ('user','application', 'premium', 'application', 'dateCreated','dateApproved', 'dateExpires', 'isPaid')
+        optional_fields = ['user_id','dateCreated', 'dateApproved', 'dateExpires']
+        fields = ('user','application', 'premium', 'application', 'dateCreated','dateApproved', 'dateExpires')
     
     def create(self, validated_data):
         insurance = Insurance(**validated_data)
