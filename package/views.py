@@ -37,6 +37,22 @@ def createPackage():
         return True
     return False
   
+  
+def embedInsuranceMultiple(packages):
+    ''' Embed insurances to multiple packages'''
+    for package in packages:
+            embedInsurance(package)
+    return packages
+
+def embedInsurance(package):
+    ''' Embed insurances to single package'''
+    lis = []
+    for insuranceId in package['insurances']:
+        ins = Insurance.objects.get(id=insuranceId)
+        ins = InsuranceSerializer(ins)
+        lis.append(ins.data)
+    package['insurances'] = lis
+    return package
 @permission_classes([AllowAny])
 class PackageView(generics.GenericAPIView):
     def __init__(self):
@@ -53,6 +69,9 @@ class PackageView(generics.GenericAPIView):
         packageSer.is_valid()
         data = packageSer.data
         packages = json.loads(json.dumps(data))
+        
+        packages=  embedInsuranceMultiple(packages)
+        
         return JsonResponse({"packages": packages}, status=status.HTTP_200_OK)
 
 
@@ -73,8 +92,18 @@ class PackageView(generics.GenericAPIView):
         thePackage.save()
         
         pack = PackageSerializer(thePackage)
-        retData = pack.data
-        return JsonResponse(retData, status=status.HTTP_200_OK)
+        package = pack.data
+        package = embedInsurance(package)
+        # for insuranceId in package['insurances']:
+        #         ins = Insurance.objects.get(id=insuranceId)
+        #         ins = InsuranceSerializer(ins)
+        #         lis.append(ins.data)
+        #         package['insurances'] = lis
+        
+        
+        
+        
+        return JsonResponse(package, status=status.HTTP_200_OK)
 
     def delete(self, request, packageId):
         ''' Pay for a package  '''
@@ -95,8 +124,7 @@ class PackageView(generics.GenericAPIView):
         thePackage.save()
         
         package = Package.objects.get(id=packageId)
-        pack = PackageSerializer(package)
+        package = PackageSerializer(package)
+        package = embedInsurance(package.data)
         
-        retData = pack.data
-        
-        return JsonResponse(retData, status=status.HTTP_200_OK)
+        return JsonResponse(package, status=status.HTTP_200_OK)
