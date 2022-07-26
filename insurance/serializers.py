@@ -4,11 +4,6 @@ from application.serializers import ApplicationSerializer
 from user.serializers import UserSerializer
 
 class InsuranceSerializer(serializers.ModelSerializer):
-    # user = UserSerializer()
-    # user = serializers.RelatedField(read_only=True)
-    #  team = serializers.RelatedField()
-    # application = ApplicationSerializer()
-    # application = serializers.RelatedField(read_only=True)
     class Meta:
         model = Insurance
         optional_fields = ['user_id','dateCreated', 'dateApproved', 'dateExpires']

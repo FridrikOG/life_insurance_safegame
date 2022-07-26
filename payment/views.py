@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from dateutil.relativedelta import relativedelta
 from user.states import *
 import requests
-
+from insurance.insuranceLogic import * 
 
 def getYearFromNow():
     expiryOfInsurance = datetime.now(timezone.utc) + relativedelta(years=1)
@@ -50,11 +50,13 @@ class PaymentAPIVIEW(generics.GenericAPIView):
             retDict['premium'] = ins.data['premium']
             state['hasPayment'] = True
             retDict['state'] = state
+            retDict['coverAmount'] = getCoverAmount()
             return JsonResponse(retDict , status=status.HTTP_200_OK)
         age = getAge(application.dob)
         paymentDue = getRate(age)
         retDict['state'] = state
         retDict['premium'] = paymentDue
+        retDict['coverAmount'] = getCoverAmount()
         return JsonResponse(retDict, status=status.HTTP_200_OK)
         
     def post(self, request):
@@ -131,7 +133,7 @@ class PaymentAPIVIEW(generics.GenericAPIView):
             state['onBlockchain'] = False
             return JsonResponse(retDict, status=status.HTTP_200_OK)
         retDict['blockchainData'] = r.json()
-        
+        retDict['coverAmount'] = getCoverAmount()
         return JsonResponse(retDict, status=status.HTTP_200_OK)
         
     def delete(self, request):
@@ -153,9 +155,11 @@ class PaymentAPIVIEW(generics.GenericAPIView):
         retDict = {}
         state['hasInsurance'] = True
         retDict['premium'] = ins.data['premium']
+        retDict['coverAmount'] = getCoverAmount()
         if hasPaid:
             retDict['state'] = state
             hasPaid.delete()
+            
             return JsonResponse(retDict, status=status.HTTP_200_OK)
     
         return JsonResponse({ "message":"Has no payment", "state":state}, status=status.HTTP_400_BAD_REQUEST)    

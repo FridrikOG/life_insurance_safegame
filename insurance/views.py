@@ -8,8 +8,7 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework import status, generics, serializers
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
-import pandas as pd
-import numpy as np
+
 import sys, os
 from user.views import *
 from application.views import *
@@ -19,44 +18,7 @@ from .serializers import InsuranceSerializer
 from django.utils.timezone import make_aware
 from payment.function import *
 from user.states import *
-
-
-COVER_MULTIPLIER=250000
-COVER_AMOUNT = 250000*10
-BASE_RATE=0.01
-# Create your views here.
-def getTables():
-    print("PWD ", os.getcwd())
-    mortalityTable=pd.read_csv('insurance/MortalityTable.csv',sep=';')
-    mortalityTable.head()
-    riskLoads=pd.read_csv('insurance/RiskLoads.csv',sep=';')
-    riskLoads.head()
-    riskLoads
-    mortalityTable['ExpectedLossMale']=mortalityTable['Male_Hazard_Rate']*COVER_MULTIPLIER
-    mortalityTable['ExpectedLossFemale']=mortalityTable['Female_Hazard_Rate']*COVER_MULTIPLIER
-    mortalityTable.head()
-    return mortalityTable, riskLoads
-
-def getRate(age,gender = 'male',factors = []):
-    mortalityTable, riskLoads = getTables()
-    if gender=='male':
-        #hazardRate=mortalityTable.loc[mortalityTable.Age == age,'Male_Hazard_Rate'].values[0]
-        expectedLoss=mortalityTable.loc[mortalityTable.Age == age,'ExpectedLossMale'].values[0]
-    else:
-        #hazardRate=mortalityTable.loc[mortalityTable.Age == age,'Female_Hazard_Rate'].values[0]
-        expectedLoss=mortalityTable.loc[mortalityTable.Age == age,'ExpectedLossFemale'].values[0]
-    for x in factors:
-        try:
-            RiskLoad=riskLoads.loc[riskLoads.Factor== x,'RiskLoad'].values[0]
-            RiskLoad_adjusted=RiskLoad*expectedLoss
-            expectedLoss+=RiskLoad_adjusted
-        except:
-            print("Error ")
-    # Yearly Premium as a percentage of cover amount
-    TotalRate=BASE_RATE+(expectedLoss/COVER_MULTIPLIER)
-    # Yearly premium (Expected loss+variable risk)
-    Annual_Premium=(BASE_RATE*COVER_MULTIPLIER)+expectedLoss
-    return int(Annual_Premium)
+from .insuranceLogic import * 
 
 def getInsurance(application):
     return Insurance.objects.filter(application=application).first()
@@ -66,8 +28,6 @@ def acceptedInsurance(insurance):
     insurance = InsuranceSerializer(insurance)
     insData = insurance.data
     return insData
-
-
     
 @permission_classes([AllowAny])
 class CreateAPIVIEW(generics.GenericAPIView):
@@ -75,6 +35,9 @@ class CreateAPIVIEW(generics.GenericAPIView):
         self.serializer = None
     def post(self, request):
         ''' Get an insurance contract '''
+        
+        
+        
         state = getStateMessages()
         user = getUser(request)
         if not user:
@@ -104,14 +67,16 @@ class CreateAPIVIEW(generics.GenericAPIView):
             state['hasInsurance'] = True
             retDict['state'] = state
             return JsonResponse(retDict, status=status.HTTP_200_OK)
-        data = acceptedInsurance(insurance)
-        data['application'] = applicationJson
-        data['user'] = userJson
+        retDict = acceptedInsurance(insurance)
+        retDict['application'] = applicationJson
+        retDict['user'] = userJson
+        retDict['coverAmount'] = COVER_AMOUNT
         hasPayment = checkHasPaid(insurance)
         if hasPayment:
             state['hasPayment'] = True
-        data['state'] = state
-        return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST)
+        retDict['coverAmount'] = getCoverAmount()
+        retDict['state'] = state
+        return JsonResponse(retDict, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
         user = getUser(request)
@@ -134,15 +99,16 @@ class CreateAPIVIEW(generics.GenericAPIView):
             retDict['state'] = state
             return JsonResponse(retDict, status=status.HTTP_200_OK)
         state['hasInsurance'] = True
+
         insData = acceptedInsurance(insurance)
-        retData = insData
+        retDict = insData
         
-        
+        retDict['coverAmount'] = getCoverAmount()
         if checkHasPaid(insurance):
             state['hasPayment'] = True
-        retData['state'] = state
+        retDict['state'] = state
         
-        return JsonResponse(retData, status=status.HTTP_200_OK)
+        return JsonResponse(retDict, status=status.HTTP_200_OK)
     
     def withdrawApplication(self, request):
         return JsonResponse({"rate" : "Here"}, status=status.HTTP_200_OK)
