@@ -12,7 +12,7 @@ class InsuranceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Insurance
         optional_fields = ['user_id','dateCreated', 'dateApproved', 'dateExpires']
-        fields = ('user','application', 'premium', 'application', 'dateCreated','dateApproved', 'dateExpires')
+        fields = ('id' ,'user','application', 'premium', 'application', 'dateCreated','dateApproved', 'dateExpires')
     
     def create(self, validated_data):
         insurance = Insurance(**validated_data)
