@@ -47,10 +47,11 @@ INSTALLED_APPS = [
     'payment.apps.PaymentConfig',
     'package.apps.PackageConfig',
     'rest_framework',
-    'rest_framework_simplejwt.token_blacklist',
+    # 'rest_framework_simplejwt.token_blacklist',
     'reset_migrations', 
 
 ]
+REST_AUTH_TOKEN_MODEL = None
 
 MIDDLEWARE = [
     # CORS
