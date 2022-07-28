@@ -229,6 +229,40 @@ class PasswordTokenCheckAPIVIEW(generics.GenericAPIView):
         except:
             return Response({'error': 'Token is not valid, please request a new one'}, status=status.HTTP_400_BAD_REQUEST)
 
+@permission_classes([AllowAny])
+class RequestPasswordResetEmail(generics.GenericAPIView):
+    serializer_class = ResetPasswordEmailRequestSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+
+        email = request.data.get('email', '')
+
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
+            uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
+            token = PasswordResetTokenGenerator().make_token(user)
+            current_site = get_current_site(
+                request=request).domain
+            relativeLink = reverse(
+                'password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
+
+            redirect_url = request.data.get('redirect_url', '')
+            # absurl = 'http://'+current_site  uidb64 + '&token=' + token
+            absurl = 'http://' + 'annum.ru.is/' + 'reset/password/complete?uidb64=' + \
+                uidb64 + '&token=' + token
+            email_body = 'Hello, \n Use link below to reset your password  \n' + \
+                absurl
+            data = {'email_body': email_body, 'to_email': user.email,
+                    'email_subject': 'Reset your passsword'}
+            Util.send_email(data)
+            dict = {'success': 'We have sent you a link to reset your password'}
+            return Response(dict, status=status.HTTP_200_OK)
+        else:
+            dict = {'error': 'Email not found in our system'}
+            return Response(dict, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 @permission_classes([AllowAny])
 class SetNewPasswordAPIView(generics.GenericAPIView):
