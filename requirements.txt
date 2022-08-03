@@ -82,7 +82,6 @@ psycopg2==2.9.3
 psycopg2-binary==2.9.3
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
-pycodestyle==2.6.0
 pycparser==2.21
 PyJWT==2.4.0
 pylint==2.14.3
