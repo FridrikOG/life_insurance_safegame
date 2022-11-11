@@ -195,9 +195,6 @@ REST_FRAMEWORK = {
 
 # TODO: make the keys hidden in proudction... but this is the info for prod
 
-EMAIL_BACKEND = 'django_ses.SESBackend'
-AWS_ACCESS_KEY_ID = 'AKIAYDHX7T7YQBWU37GD'
-AWS_SECRET_ACCESS_KEY = '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'
 
 # EMAIL_HOST = 'email-smtp.eu-west-2.amazonaws.com'
 # EMAIL_HOST_USER = 'AKIAYDHX7T7YXQSINV46'  # this is exactly the value 'apikey'
