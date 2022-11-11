@@ -23,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Generated Nov 20th 18:27
-SECRET_KEY = 'lx$yin4fnpme%4e(svbb^j0k9imq$3%%7rv%cc38dn(@76n=s('
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # This is a security flaw, use CORS_ALLOWED_ORIGINS in production
 CORS_ORIGIN_ALLOW_ALL = True
@@ -108,17 +108,7 @@ WSGI_APPLICATION = 'squid.wsgi.application'
 # }
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'ftxybkan',
-        'USER': 'ftxybkan',
-        'PASSWORD': 'u9__2EYiyjn4qWHrpjT8QQsMrSPu31u4',
-        'HOST': 'balarama.db.elephantsql.com',
-        'PORT': '5432',
-        'TEST': {
-            'MIRROR': 'default',
-        }
-    }
+
 }
 # postgres://ftxybkan:u9__2EYiyjn4qWHrpjT8QQsMrSPu31u4@balarama.db.elephantsql.com/ftxybkan
 
@@ -129,8 +119,7 @@ ALLOWED_HOSTS = [
     "localhost:3000",
     "localhost",
     "127.0.0.1",
-    '*',
-    'insurancebackend.herokuapp.com'
+    '*'
 ]
 
 # Password validation
@@ -179,30 +168,6 @@ REST_FRAMEWORK = {
     'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S:%f',
 }
 
-
-
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-
-# FOR TESTING
-# EMAIL_HOST = 'smtp.mailtrap.io'
-# EMAIL_HOST_USER = '3d5774375bfad8'
-# EMAIL_HOST_PASSWORD = 'b3a3cc06188638'
-# EMAIL_PORT = '2525'
-
-# TODO: make the keys hidden in proudction... but this is the info for prod
-
-
-# EMAIL_HOST = 'email-smtp.eu-west-2.amazonaws.com'
-# EMAIL_HOST_USER = 'AKIAYDHX7T7YXQSINV46'  # this is exactly the value 'apikey'
-# EMAIL_HOST_PASSWORD = 'BEcu173yLq/L50J9itIgBIXAeZbkgvFx6ynwdDotc26T'
-# EMAIL_PORT = 465
-# EMAIL_USE_TLS = True
-
-# EMAIL_HOST_USER = 'savegame@gmail.com'
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=200000),
